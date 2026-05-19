@@ -4,6 +4,17 @@
 # Author: Akshay
 # Goal: Understand our dataset before ML
 # ============================================
+# SAFE READINGS :1910
+# WARNING READINGS :60
+# DANGER READINGS :30
+# AVERAGE MOISTURE : 2212.44
+# KEY OBSERVATIONS:
+# max accel_x : 2760.88
+# max accel_y : 2712.29
+# max accel_z : 2172.52
+#no missing values
+
+
 
 import pandas as pd
 
