@@ -2,7 +2,7 @@
 AI-powered Landslide Early Warning System
 
 ## Author
-Akshay — ECE Year 1, Vishnu Institute of Technology
+Akshay Kumar — ECE , Vishnu Institute of Technology
 
 ## Progress
 - [x] Day 1 — Sensor data simulation
