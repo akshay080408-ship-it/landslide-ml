@@ -7,5 +7,5 @@ Akshay — ECE Year 1, Vishnu Institute of Technology
 ## Progress
 - [x] Day 1 — Sensor data simulation
 - [x] Day 2 — Data exploration
-- [ ] Day 3 — Feature engineering
+- [x] Day 3 — Feature engineering
 ...
