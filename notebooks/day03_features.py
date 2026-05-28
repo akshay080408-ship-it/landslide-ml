@@ -6,10 +6,10 @@
 #       from raw sensor data
 # ============================================
 # How many columns after features?   13
-# What is average accel_magnitude?   
-# What is danger row magnitude_change?
-# What is safe row magnitude_change?
-# Why is moisture_change important?
+# What is average accel_magnitude?   3565
+# What is danger row magnitude_change?  683.37
+# What is safe row magnitude_change?  16.57
+# Why is moisture_change important?  Because it shows how quickly moisture is rising, which can indicate a leak before it becomes dangerous.
 import pandas as pd
 import numpy as np
 
