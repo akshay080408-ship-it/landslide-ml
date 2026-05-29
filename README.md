@@ -11,7 +11,7 @@ Akshay Kumar — ECE , Vishnu Institute of Technology
 - [x] Day 2 — Data exploration
 - [x] Day 3 — Feature engineering
 - [x] Day 4 — Visualization part 1
-- [ ] Day 5 — Visualization part 2
+- [x] Day 5 — Visualization part 2
 - [ ] Day 6 — Risk labeling
 - [ ] Day 7 — NumPy deep dive
 - [ ] Day 8 — Pandas deep dive
