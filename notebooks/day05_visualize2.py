@@ -5,6 +5,19 @@
 # Goal: Deep dive analysis of sensor patterns
 #       Focus on danger events and timing
 # ============================================
+# DAY 5 OBSERVATIONS:
+# 1. Peak danger hour: 16:00 (4 PM)
+# 2. Danger is sudden spike in simulated data
+#    Real data will show gradual buildup
+# 3. Rolling average effectively removes
+#    noise while keeping danger spikes ✅
+# 4. Magnitude vs Moisture best feature pair
+#    for separating risk levels
+# 5. Smoothed vs Smoothed loses separation
+#    → Keep raw features alongside smoothed
+# 6. Both sensors spike together at danger
+#    → Confirms 0.89 correlation from Day 4
+# ============================================
 
 import pandas as pd
 import numpy as np
