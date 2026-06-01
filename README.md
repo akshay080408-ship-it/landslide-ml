@@ -13,10 +13,11 @@ Akshay Kumar — ECE , Vishnu Institute of Technology
 - [x] Day 4 — Visualization part 1
 - [x] Day 5 — Visualization part 2
 - [x] Day 6 — Risk labeling
-- [ ] Day 7 — NumPy deep dive
+- [x] Day 7 — NumPy deep dive
 - [ ] Day 8 — Pandas deep dive
 - [ ] Day 9 — Data quality handling
 - [ ] Day 10 — Phase 1 review + GitHub
+
 
 ### Phase 2 — Classical ML (Days 11–21)
 - [ ] Day 11 — ML concepts theory
