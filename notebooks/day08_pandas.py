@@ -19,7 +19,7 @@
 # ============================================
 
 import pandas as pd
-import numpy as np
+import numpy as npgii
 import matplotlib.pyplot as plt
 
 print("="*50)
