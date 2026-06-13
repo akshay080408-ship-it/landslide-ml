@@ -15,8 +15,8 @@ Akshay Kumar — ECE , Vishnu Institute of Technology
 - [x] Day 6 — Risk labeling
 - [x] Day 7 — NumPy deep dive
 - [x] Day 8 — Pandas deep dive
-- [ ] Day 9 — Data quality handling
-- [ ] Day 10 — Phase 1 review + GitHub
+- [x] Day 9 — Data quality handling
+- [x] Day 10 — Phase 1 review + GitHub
 
 
 ### Phase 2 — Classical ML (Days 11–21)
