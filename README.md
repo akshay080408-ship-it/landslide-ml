@@ -21,7 +21,7 @@ Akshay Kumar — ECE , Vishnu Institute of Technology
 
 ### Phase 2 — Classical ML (Days 11–21)
 - [x] Day 11 — ML concepts theory
-- [ ] Day 12 — First ML model (Random Forest)
+- [x] Day 12 — First ML model (Random Forest)
 - [ ] Day 13 — Feature importance
 - [ ] Day 14 — Model improvement
 - [ ] Day 15 — Anomaly detection
