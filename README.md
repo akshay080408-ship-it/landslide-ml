@@ -24,7 +24,7 @@ Akshay Kumar — ECE , Vishnu Institute of Technology
 - [x] Day 12 — First ML model (Random Forest)
 - [x] Day 13 — Feature importance
 - [x] Day 14 — Model improvement
-- [ ] Day 15 — Anomaly detection
+- [x] Day 15 — Anomaly detection
 - [ ] Day 16 — Save and load models
 - [ ] Day 17 — Real time simulation
 - [ ] Day 18 — Flask API part 1
