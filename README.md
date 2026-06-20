@@ -25,7 +25,7 @@ Akshay Kumar — ECE , Vishnu Institute of Technology
 - [x] Day 13 — Feature importance
 - [x] Day 14 — Model improvement
 - [x] Day 15 — Anomaly detection
-- [ ] Day 16 — Save and load models
+- [x] Day 16 — Save and load models
 - [ ] Day 17 — Real time simulation
 - [ ] Day 18 — Flask API part 1
 - [ ] Day 19 — Flask API testing

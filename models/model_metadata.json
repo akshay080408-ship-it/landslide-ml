@@ -1,0 +1,35 @@
+{
+  "project": "LandSense ML",
+  "version": "1.0",
+  "created_date": "2026-06-20",
+  "author": "Akshay Kumar",
+  "institution": "Vishnu Institute of Technology",
+  "training_samples": 2000,
+  "features": [
+    "accel_x",
+    "accel_y",
+    "moisture",
+    "vibration",
+    "accel_magnitude",
+    "moisture_avg5",
+    "moisture_change",
+    "magnitude_change"
+  ],
+  "feature_count": 8,
+  "random_forest": {
+    "accuracy": 1.0,
+    "n_estimators": 150,
+    "max_depth": 10
+  },
+  "isolation_forest": {
+    "contamination": 0.03,
+    "anomaly_rate_training": 0.03
+  },
+  "label_mapping": {
+    "0": "SAFE",
+    "1": "WARNING",
+    "2": "DANGER"
+  },
+  "data_quality_score": 99.5,
+  "notes": "Trained on simulated ESP32 sensor data. Real hardware integration pending Month 2."
+}
