@@ -43,3 +43,17 @@
 2026-06-25 13:20:04,472 - INFO - 127.0.0.1 - - [25/Jun/2026 13:20:04] "[31m[1mPOST /predict HTTP/1.1[0m" 429 -
 2026-06-25 13:20:04,482 - WARNING - Rate limit exceeded
 2026-06-25 13:20:04,482 - INFO - 127.0.0.1 - - [25/Jun/2026 13:20:04] "[31m[1mPOST /predict HTTP/1.1[0m" 429 -
+2026-06-26 13:19:31,931 - INFO - Loading production model...
+2026-06-26 13:19:34,554 - INFO - Model loaded - version 1.0
+2026-06-26 13:19:34,556 - INFO - Starting Flask server...
+2026-06-26 13:19:34,602 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://172.23.204.202:5000
+2026-06-26 13:19:34,604 - INFO - [33mPress CTRL+C to quit[0m
+2026-06-26 13:19:34,605 - INFO -  * Restarting with stat
+2026-06-26 13:19:35,640 - INFO - Loading production model...
+2026-06-26 13:19:36,737 - INFO - Model loaded - version 1.0
+2026-06-26 13:19:36,739 - INFO - Starting Flask server...
+2026-06-26 13:19:36,739 - WARNING -  * Debugger is active!
+2026-06-26 13:19:36,753 - INFO -  * Debugger PIN: 573-667-843

@@ -29,7 +29,7 @@ Akshay Kumar — ECE , Vishnu Institute of Technology
 - [x] Day 17 — Real time simulation
 - [x] Day 18 — Flask API part 1
 - [x] Day 19 — Flask API testing
-- [ ] Day 20 — Email alerts
+- [x] Day 20 — Email alerts
 - [ ] Day 21 — Phase 2 review
 
 ### Phase 3 — Deep Learning (Days 22–35)
