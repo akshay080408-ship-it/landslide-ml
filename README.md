@@ -23,14 +23,14 @@ Akshay Kumar — ECE , Vishnu Institute of Technology
 - [x] Day 11 — ML concepts theory
 - [x] Day 12 — First ML model (Random Forest)
 - [x] Day 13 — Feature importance
-- [x] Day 14 — Model improvement
+- [x] Day 14 — Model improvementzzzzz
 - [x] Day 15 — Anomaly detection
 - [x] Day 16 — Save and load models
 - [x] Day 17 — Real time simulation
 - [x] Day 18 — Flask API part 1
 - [x] Day 19 — Flask API testing
 - [x] Day 20 — Email alerts
-- [ ] Day 21 — Phase 2 review
+- [x] Day 21 — Phase 2 review
 
 ### Phase 3 — Deep Learning (Days 22–35)
 - [ ] Day 22 — LSTM concepts
