@@ -59,6 +59,12 @@ logger.info(f"Model loaded - version {metadata['version']}")
 # STEP 3: SENSOR BUFFER (same as Day 18)
 # ════════════════════════════════════════════
 class SensorBuffer:
+    """
+    Maintains a sliding window of recent sensor readings.
+    Calculates live features (magnitude, rolling avg,
+    rate of change) without needing full CSV history.
+    Used for real-time ESP32 data processing.
+    """
     def __init__(self, window_size=5):
         self.window_size = window_size
         self.moisture_history = deque(maxlen=window_size)
