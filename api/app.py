@@ -60,7 +60,7 @@ logger.info(f"Model loaded - version {metadata['version']}")
 # ════════════════════════════════════════════
 class SensorBuffer:
     """
-    Maintains a sliding window of recent sensor readings.
+    Maintains a sliding window of recent sensor readings. 
     Calculates live features (magnitude, rolling avg,
     rate of change) without needing full CSV history.
     Used for real-time ESP32 data processing.
