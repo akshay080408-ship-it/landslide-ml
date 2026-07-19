@@ -1,8 +1,46 @@
 # 🏔️ LandSense ML
-AI-powered Landslide Early Warning System
+
+AI-powered Landslide Early Warning System that combines sensor data, machine learning, and IoT to detect potential landslides in real time.
+
+The system analyzes:
+- Soil moisture
+- Ground vibration
+- Ground tilt (accelerometer)
+
+It predicts whether the terrain is Safe, Warning, or Danger and can trigger alerts through a Flask API.
+
+## Project Architecture Flow
+
+ESP32 Sensors
+      ↓
+Sensor Data
+      ↓
+Python Processing
+      ↓
+Feature Engineering
+      ↓
+Random Forest / LSTM
+      ↓
+Prediction
+      ↓
+Flask API
+      ↓
+Dashboard / Email Alerts
 
 ## Author
 Akshay Kumar — ECE , Vishnu Institute of Technology
+
+## Tech Stack
+
+- Python
+- Pandas
+- NumPy
+- Matplotlib
+- Scikit-learn
+- TensorFlow/Keras
+- Flask
+- ESP32
+- Git & GitHub
 
 ## Progress
 
@@ -23,7 +61,7 @@ Akshay Kumar — ECE , Vishnu Institute of Technology
 - [x] Day 11 — ML concepts theory
 - [x] Day 12 — First ML model (Random Forest)
 - [x] Day 13 — Feature importance
-- [x] Day 14 — Model improvementzzzzz
+- [x] Day 14 — Model improvement
 - [x] Day 15 — Anomaly detection
 - [x] Day 16 — Save and load models
 - [x] Day 17 — Real time simulation
@@ -59,3 +97,12 @@ Akshay Kumar — ECE , Vishnu Institute of Technology
 - [ ] Day 43 — Performance optimization
 - [ ] Day 44 — Project README
 - [ ] Day 45 — Final demo
+
+
+## Future Improvements
+
+- Rainfall prediction
+- GPS integration
+- Multiple sensor nodes
+- Mobile application
+- Cloud deployment
