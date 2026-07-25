@@ -14,7 +14,7 @@
 # 5. This proves buffer + model work together
 #    exactly as designed in Day 17
 # 6. API accessible on network IP for future ESP32
-# ============================================
+# ============================================C:\Users\Akshay\AppData\Local\Programs\Python\Python311\python.exe api\app.py
 
 from flask import Flask, request, jsonify
 import joblib
