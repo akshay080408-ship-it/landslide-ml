@@ -72,7 +72,7 @@ Akshay Kumar — ECE , Vishnu Institute of Technology
 
 ### Phase 3 — Deep Learning (Days 22–35)
 - [x] Day 22 — LSTM concepts
-- [ ] Day 23 — Sequence data preparation
+- [x] Day 23 — Sequence data preparation
 - [ ] Day 24 — Build LSTM model
 - [ ] Day 25 — Train LSTM
 - [ ] Day 26 — Handle class imbalance
