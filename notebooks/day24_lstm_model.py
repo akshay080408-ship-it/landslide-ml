@@ -6,6 +6,7 @@
 #       10-reading sequences and predicts
 #       SAFE / WARNING / DANGER
 # ============================================
+<<<<<<< HEAD
 # ============================================
 # DAY 24 OBSERVATIONS:
 # 1. LSTM accuracy: 70.6% (vs RF 99.75%)
@@ -17,6 +18,8 @@
 # 6. Fix planned for Day 25:
 #    oversample danger + tune model
 # ============================================
+=======
+>>>>>>> d028a6b5c48e2662f140d2d0665e9d79cfbbad1c
 
 import numpy as np
 import pandas as pd
