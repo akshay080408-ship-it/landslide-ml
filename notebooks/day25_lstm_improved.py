@@ -5,6 +5,17 @@
 # Goal: Fix Day 24's 0% DANGER recall
 #       Using oversampling + better tuning
 # ============================================
+# ============================================
+# DAY 25 OBSERVATIONS:
+# 1. LSTM v2 accuracy: 60.55%
+# 2. DANGER recall: 9.1% (1/11 caught)
+# 3. Root cause: LSTM needs more data
+#    Only 11 danger sequences in test set
+# 4. Key finding: RF >> LSTM for small
+#    imbalanced IoT datasets
+# 5. LSTM will improve with real ESP32 data
+# 6. This comparison = IEEE paper Section 4
+# ============================================
 
 import numpy as np
 import pandas as pd
