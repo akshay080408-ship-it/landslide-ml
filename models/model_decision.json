@@ -1,0 +1,22 @@
+{
+  "production_model": "Random Forest",
+  "reason": [
+    "99.75% accuracy vs LSTM 60.55%",
+    "100% DANGER recall vs LSTM 9.1%",
+    "Works with small datasets (1600 samples)",
+    "Interpretable via feature importance",
+    "Faster inference (<1ms per prediction)"
+  ],
+  "lstm_status": "experimental",
+  "lstm_future": "Retrain with 6+ months real ESP32 data",
+  "rf_version": "v2 (8 features, 150 trees)",
+  "confidence_bands": {
+    "CRITICAL": "danger >= 90%",
+    "HIGH": "danger 70-90%",
+    "MODERATE": "danger 50-70%",
+    "HIGH WARNING": "warning >= 80%",
+    "LOW WARNING": "warning < 80%",
+    "VERY SAFE": "safe >= 90%",
+    "SAFE": "safe < 90%"
+  }
+}

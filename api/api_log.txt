@@ -1700,3 +1700,86 @@
 2026-08-07 06:09:57,171 - INFO - Prediction: WARNING (77.3%)
 2026-08-07 06:09:57,171 - INFO - 127.0.0.1 - - [07/Aug/2026 06:09:57] "POST /predict HTTP/1.1" 200 -
 2026-08-07 06:09:57,178 - INFO - 127.0.0.1 - - [07/Aug/2026 06:09:57] "GET /stats HTTP/1.1" 200 -
+2026-08-07 06:26:15,910 - INFO - Loading production model...
+2026-08-07 06:26:17,166 - INFO - Model loaded - version 1.0
+2026-08-07 06:26:17,182 - INFO - Starting Flask server...
+2026-08-07 06:26:17,202 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.90.234.202:5000
+2026-08-07 06:26:17,203 - INFO - [33mPress CTRL+C to quit[0m
+2026-08-07 06:26:17,205 - INFO -  * Restarting with stat
+2026-08-07 06:26:17,649 - INFO - Loading production model...
+2026-08-07 06:26:18,336 - INFO - Model loaded - version 1.0
+2026-08-07 06:26:18,336 - INFO - Starting Flask server...
+2026-08-07 06:26:18,338 - WARNING -  * Debugger is active!
+2026-08-07 06:26:18,345 - INFO -  * Debugger PIN: 573-667-843
+2026-08-07 06:26:34,122 - INFO - 127.0.0.1 - - [07/Aug/2026 06:26:34] "OPTIONS /predict HTTP/1.1" 200 -
+2026-08-07 06:26:34,189 - INFO - Prediction: WARNING (96.0%)
+2026-08-07 06:26:34,189 - INFO - 127.0.0.1 - - [07/Aug/2026 06:26:34] "POST /predict HTTP/1.1" 200 -
+2026-08-07 06:26:34,223 - INFO - 127.0.0.1 - - [07/Aug/2026 06:26:34] "GET /stats HTTP/1.1" 200 -
+2026-08-07 06:27:00,247 - INFO - 127.0.0.1 - - [07/Aug/2026 06:27:00] "OPTIONS /predict HTTP/1.1" 200 -
+2026-08-07 06:27:00,333 - INFO - Prediction: SAFE (99.2%)
+2026-08-07 06:27:00,333 - INFO - 127.0.0.1 - - [07/Aug/2026 06:27:00] "POST /predict HTTP/1.1" 200 -
+2026-08-07 06:27:00,351 - INFO - 127.0.0.1 - - [07/Aug/2026 06:27:00] "GET /stats HTTP/1.1" 200 -
+2026-08-07 06:27:05,251 - INFO - 127.0.0.1 - - [07/Aug/2026 06:27:05] "OPTIONS /predict HTTP/1.1" 200 -
+2026-08-07 06:27:05,325 - INFO - Prediction: SAFE (99.1%)
+2026-08-07 06:27:05,326 - INFO - 127.0.0.1 - - [07/Aug/2026 06:27:05] "POST /predict HTTP/1.1" 200 -
+2026-08-07 06:27:05,333 - INFO - 127.0.0.1 - - [07/Aug/2026 06:27:05] "GET /stats HTTP/1.1" 200 -
+2026-08-07 06:27:10,321 - INFO - Prediction: SAFE (97.1%)
+2026-08-07 06:27:10,321 - INFO - 127.0.0.1 - - [07/Aug/2026 06:27:10] "POST /predict HTTP/1.1" 200 -
+2026-08-07 06:27:10,328 - INFO - 127.0.0.1 - - [07/Aug/2026 06:27:10] "GET /stats HTTP/1.1" 200 -
+2026-08-07 06:27:15,249 - INFO - 127.0.0.1 - - [07/Aug/2026 06:27:15] "OPTIONS /predict HTTP/1.1" 200 -
+2026-08-07 06:27:15,326 - INFO - Prediction: WARNING (99.3%)
+2026-08-07 06:27:15,326 - INFO - 127.0.0.1 - - [07/Aug/2026 06:27:15] "POST /predict HTTP/1.1" 200 -
+2026-08-07 06:27:15,331 - INFO - 127.0.0.1 - - [07/Aug/2026 06:27:15] "GET /stats HTTP/1.1" 200 -
+2026-08-07 06:27:20,317 - INFO - Prediction: WARNING (94.0%)
+2026-08-07 06:27:20,317 - INFO - 127.0.0.1 - - [07/Aug/2026 06:27:20] "POST /predict HTTP/1.1" 200 -
+2026-08-07 06:27:20,324 - INFO - 127.0.0.1 - - [07/Aug/2026 06:27:20] "GET /stats HTTP/1.1" 200 -
+2026-08-07 06:27:25,254 - INFO - 127.0.0.1 - - [07/Aug/2026 06:27:25] "OPTIONS /predict HTTP/1.1" 200 -
+2026-08-07 06:27:25,327 - INFO - DANGER detected - confidence: 68.7%
+2026-08-07 06:27:25,327 - INFO - Prediction: DANGER (68.7%)
+2026-08-07 06:27:25,327 - INFO - 127.0.0.1 - - [07/Aug/2026 06:27:25] "POST /predict HTTP/1.1" 200 -
+2026-08-07 06:27:25,334 - INFO - 127.0.0.1 - - [07/Aug/2026 06:27:25] "GET /stats HTTP/1.1" 200 -
+2026-08-07 06:27:30,366 - INFO - Prediction: WARNING (77.3%)
+2026-08-07 06:27:30,366 - INFO - 127.0.0.1 - - [07/Aug/2026 06:27:30] "POST /predict HTTP/1.1" 200 -
+2026-08-07 06:27:30,373 - INFO - 127.0.0.1 - - [07/Aug/2026 06:27:30] "GET /stats HTTP/1.1" 200 -
+2026-08-07 06:27:34,112 - INFO - 127.0.0.1 - - [07/Aug/2026 06:27:34] "OPTIONS /predict HTTP/1.1" 200 -
+2026-08-07 06:27:34,195 - INFO - Prediction: WARNING (94.0%)
+2026-08-07 06:27:34,196 - INFO - 127.0.0.1 - - [07/Aug/2026 06:27:34] "POST /predict HTTP/1.1" 200 -
+2026-08-07 06:27:34,207 - INFO - 127.0.0.1 - - [07/Aug/2026 06:27:34] "GET /stats HTTP/1.1" 200 -
+2026-08-07 06:27:36,180 - INFO - Prediction: WARNING (75.5%)
+2026-08-07 06:27:36,181 - INFO - 127.0.0.1 - - [07/Aug/2026 06:27:36] "POST /predict HTTP/1.1" 200 -
+2026-08-07 06:27:36,188 - INFO - 127.0.0.1 - - [07/Aug/2026 06:27:36] "GET /stats HTTP/1.1" 200 -
+2026-08-07 06:27:41,117 - INFO - 127.0.0.1 - - [07/Aug/2026 06:27:41] "OPTIONS /predict HTTP/1.1" 200 -
+2026-08-07 06:27:41,165 - INFO - Prediction: SAFE (92.1%)
+2026-08-07 06:27:41,165 - INFO - 127.0.0.1 - - [07/Aug/2026 06:27:41] "POST /predict HTTP/1.1" 200 -
+2026-08-07 06:27:41,178 - INFO - 127.0.0.1 - - [07/Aug/2026 06:27:41] "GET /stats HTTP/1.1" 200 -
+2026-08-07 06:27:43,416 - INFO - Prediction: SAFE (99.4%)
+2026-08-07 06:27:43,416 - INFO - 127.0.0.1 - - [07/Aug/2026 06:27:43] "POST /predict HTTP/1.1" 200 -
+2026-08-07 06:27:43,416 - INFO - 127.0.0.1 - - [07/Aug/2026 06:27:43] "GET /stats HTTP/1.1" 200 -
+2026-08-07 06:27:43,617 - WARNING - Rate limit exceeded
+2026-08-07 06:27:43,619 - INFO - 127.0.0.1 - - [07/Aug/2026 06:27:43] "[31m[1mPOST /predict HTTP/1.1[0m" 429 -
+2026-08-07 06:27:43,624 - INFO - 127.0.0.1 - - [07/Aug/2026 06:27:43] "GET /stats HTTP/1.1" 200 -
+2026-08-07 06:27:49,111 - INFO - 127.0.0.1 - - [07/Aug/2026 06:27:49] "OPTIONS /predict HTTP/1.1" 200 -
+2026-08-07 06:27:49,171 - INFO - Prediction: SAFE (99.1%)
+2026-08-07 06:27:49,177 - INFO - 127.0.0.1 - - [07/Aug/2026 06:27:49] "POST /predict HTTP/1.1" 200 -
+2026-08-07 06:27:49,178 - INFO - 127.0.0.1 - - [07/Aug/2026 06:27:49] "GET /stats HTTP/1.1" 200 -
+2026-08-07 06:27:54,120 - INFO - 127.0.0.1 - - [07/Aug/2026 06:27:54] "OPTIONS /predict HTTP/1.1" 200 -
+2026-08-07 06:27:54,171 - INFO - Prediction: SAFE (94.4%)
+2026-08-07 06:27:54,171 - INFO - 127.0.0.1 - - [07/Aug/2026 06:27:54] "POST /predict HTTP/1.1" 200 -
+2026-08-07 06:27:54,182 - INFO - 127.0.0.1 - - [07/Aug/2026 06:27:54] "GET /stats HTTP/1.1" 200 -
+2026-08-07 06:27:59,156 - INFO - Prediction: WARNING (100.0%)
+2026-08-07 06:27:59,156 - INFO - 127.0.0.1 - - [07/Aug/2026 06:27:59] "POST /predict HTTP/1.1" 200 -
+2026-08-07 06:27:59,156 - INFO - 127.0.0.1 - - [07/Aug/2026 06:27:59] "GET /stats HTTP/1.1" 200 -
+2026-08-07 06:28:04,114 - INFO - 127.0.0.1 - - [07/Aug/2026 06:28:04] "OPTIONS /predict HTTP/1.1" 200 -
+2026-08-07 06:28:04,164 - INFO - Prediction: WARNING (94.0%)
+2026-08-07 06:28:04,170 - INFO - 127.0.0.1 - - [07/Aug/2026 06:28:04] "POST /predict HTTP/1.1" 200 -
+2026-08-07 06:28:04,175 - INFO - 127.0.0.1 - - [07/Aug/2026 06:28:04] "GET /stats HTTP/1.1" 200 -
+2026-08-07 06:28:04,637 - INFO - Prediction: SAFE (99.9%)
+2026-08-07 06:28:04,637 - INFO - 127.0.0.1 - - [07/Aug/2026 06:28:04] "POST /predict HTTP/1.1" 200 -
+2026-08-07 06:28:04,644 - INFO - 127.0.0.1 - - [07/Aug/2026 06:28:04] "GET /stats HTTP/1.1" 200 -
+2026-08-07 06:28:10,115 - INFO - 127.0.0.1 - - [07/Aug/2026 06:28:10] "OPTIONS /predict HTTP/1.1" 200 -
+2026-08-07 06:28:10,177 - INFO - Prediction: SAFE (99.1%)
+2026-08-07 06:28:10,177 - INFO - 127.0.0.1 - - [07/Aug/2026 06:28:10] "POST /predict HTTP/1.1" 200 -
+2026-08-07 06:28:10,178 - INFO - 127.0.0.1 - - [07/Aug/2026 06:28:10] "GET /stats HTTP/1.1" 200 -

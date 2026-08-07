@@ -6,7 +6,7 @@
 #       add logging, rate limiting
 # ============================================
 
-from flask import Flask,request, jsonify
+from flask import Flask, request, jsonify
 from flask_cors import CORS
 import joblib
 import pandas as pd
@@ -41,7 +41,7 @@ print("   DAY 19 — HARDENED FLASK API")
 print("="*55)
 
 app = Flask(__name__)
-CORS(app)  # Allow cross-origin requests for testing
+CORS(app)  # Enable CORS for all routes
 
 # ════════════════════════════════════════════
 # STEP 2: LOAD MODEL (same as Day 18)
@@ -66,12 +66,6 @@ logger.info(f"Model loaded - version {metadata['version']}")
 # STEP 3: SENSOR BUFFER (same as Day 18)
 # ════════════════════════════════════════════
 class SensorBuffer:
-    """
-    Maintains a sliding window of recent sensor readings. 
-    Calculates live features (magnitude, rolling avg,
-    rate of change) without needing full CSV history.
-    Used for real-time ESP32 data processing.
-    """
     def __init__(self, window_size=5):
         self.window_size = window_size
         self.moisture_history = deque(maxlen=window_size)
