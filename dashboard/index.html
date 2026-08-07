@@ -1,0 +1,1121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>LandSense ML — Live Dashboard</title>
+  <style>
+    /* ═══════════════════════════════════
+       GLOBAL STYLES
+    ═══════════════════════════════════ */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg-primary:    #0d1117;
+      --bg-secondary:  #161b22;
+      --bg-card:       #1c2128;
+      --border:        #30363d;
+      --text-primary:  #e6edf3;
+      --text-muted:    #8b949e;
+      --green:         #3fb950;
+      --yellow:        #d29922;
+      --red:           #f85149;
+      --blue:          #388bfd;
+      --purple:        #a371f7;
+      --accent:        #58a6ff;
+    }
+
+    body {
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: 'Segoe UI', -apple-system,
+                   BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+    }
+
+    /* ═══════════════════════════════════
+       HEADER
+    ═══════════════════════════════════ */
+    header {
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: -0.5px;
+    }
+
+    .logo span {
+      color: var(--green);
+    }
+
+    .live-badge {
+      background: var(--green);
+      color: #000;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 20px;
+      letter-spacing: 1px;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .header-info {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .update-timer {
+      font-size: 12px;
+      color: var(--accent);
+    }
+
+    /* ═══════════════════════════════════
+       MAIN LAYOUT
+    ═══════════════════════════════════ */
+    main {
+      padding: 24px 28px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .grid-top {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .grid-middle {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .grid-bottom {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    /* ═══════════════════════════════════
+       CARDS
+    ═══════════════════════════════════ */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px;
+    }
+
+    .card-title {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+
+    /* ═══════════════════════════════════
+       RISK STATUS CARD (BIG)
+    ═══════════════════════════════════ */
+    .risk-card {
+      border-radius: 12px;
+      padding: 28px;
+      text-align: center;
+      transition: all 0.4s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .risk-card::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(
+        circle at center,
+        currentColor 0%,
+        transparent 60%
+      );
+      opacity: 0.05;
+    }
+
+    .risk-safe {
+      background: #0d2818;
+      border: 2px solid var(--green);
+      color: var(--green);
+    }
+
+    .risk-warning {
+      background: #2d1e00;
+      border: 2px solid var(--yellow);
+      color: var(--yellow);
+    }
+
+    .risk-danger {
+      background: #2d0d0d;
+      border: 2px solid var(--red);
+      color: var(--red);
+      animation: dangerPulse 1s infinite;
+    }
+
+    @keyframes dangerPulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(248,81,73,0.4); }
+      50% { box-shadow: 0 0 20px 8px rgba(248,81,73,0.2); }
+    }
+
+    .risk-icon {
+      font-size: 48px;
+      margin-bottom: 8px;
+    }
+
+    .risk-label {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      margin-bottom: 4px;
+    }
+
+    .risk-action {
+      font-size: 12px;
+      opacity: 0.8;
+      font-weight: 500;
+    }
+
+    /* ═══════════════════════════════════
+       STAT CARDS (top row)
+    ═══════════════════════════════════ */
+    .stat-value {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .stat-sub {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .stat-green { color: var(--green); }
+    .stat-yellow { color: var(--yellow); }
+    .stat-red { color: var(--red); }
+    .stat-blue { color: var(--blue); }
+
+    /* ═══════════════════════════════════
+       CONFIDENCE BAR
+    ═══════════════════════════════════ */
+    .confidence-bar-bg {
+      background: var(--bg-secondary);
+      border-radius: 6px;
+      height: 10px;
+      margin: 10px 0 6px;
+      overflow: hidden;
+    }
+
+    .confidence-bar-fill {
+      height: 100%;
+      border-radius: 6px;
+      background: linear-gradient(
+        90deg, var(--green), var(--blue)
+      );
+      transition: width 0.5s ease;
+    }
+
+    /* ═══════════════════════════════════
+       SENSOR VALUES
+    ═══════════════════════════════════ */
+    .sensor-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .sensor-item {
+      background: var(--bg-secondary);
+      border-radius: 8px;
+      padding: 12px;
+    }
+
+    .sensor-name {
+      font-size: 10px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+
+    .sensor-val {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .sensor-bar {
+      margin-top: 6px;
+      background: var(--bg-primary);
+      border-radius: 4px;
+      height: 4px;
+      overflow: hidden;
+    }
+
+    .sensor-bar-fill {
+      height: 100%;
+      border-radius: 4px;
+      background: var(--blue);
+      transition: width 0.5s ease;
+    }
+
+    /* ═══════════════════════════════════
+       CHART AREA
+    ═══════════════════════════════════ */
+    .chart-container {
+      position: relative;
+      height: 220px;
+      margin-top: 8px;
+    }
+
+    canvas {
+      width: 100% !important;
+    }
+
+    /* ═══════════════════════════════════
+       PREDICTION TABLE
+    ═══════════════════════════════════ */
+    .pred-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    .pred-table th {
+      text-align: left;
+      padding: 8px 12px;
+      color: var(--text-muted);
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .pred-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-primary);
+    }
+
+    .pred-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .pred-table tr:hover td {
+      background: var(--bg-secondary);
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    .badge-safe {
+      background: #0d2818;
+      color: var(--green);
+      border: 1px solid var(--green);
+    }
+
+    .badge-warning {
+      background: #2d1e00;
+      color: var(--yellow);
+      border: 1px solid var(--yellow);
+    }
+
+    .badge-danger {
+      background: #2d0d0d;
+      color: var(--red);
+      border: 1px solid var(--red);
+    }
+
+    /* ═══════════════════════════════════
+       ALERT COUNTS
+    ═══════════════════════════════════ */
+    .alert-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .alert-row:last-child {
+      border-bottom: none;
+    }
+
+    .alert-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 8px;
+    }
+
+    /* ═══════════════════════════════════
+       CONNECTION STATUS
+    ═══════════════════════════════════ */
+    .conn-status {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+    }
+
+    .conn-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--green);
+      animation: pulse 1.5s infinite;
+    }
+
+    .conn-dot.offline {
+      background: var(--red);
+      animation: none;
+    }
+
+    /* ═══════════════════════════════════
+       FOOTER
+    ═══════════════════════════════════ */
+    footer {
+      text-align: center;
+      padding: 16px;
+      color: var(--text-muted);
+      font-size: 11px;
+      border-top: 1px solid var(--border);
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════
+     HEADER
+═══════════════════════════════════ -->
+<header>
+  <div class="header-left">
+    <div class="logo">Land<span>Sense</span> ML</div>
+    <span class="live-badge">LIVE</span>
+  </div>
+  <div class="header-right">
+    <div class="conn-status">
+      <div class="conn-dot" id="connDot"></div>
+      <span id="connText">Connecting...</span>
+    </div>
+    <div class="header-info">
+      AI-Powered Landslide Early Warning
+    </div>
+    <div class="update-timer" id="timer">
+      Next update: 5s
+    </div>
+  </div>
+</header>
+
+<!-- ═══════════════════════════════════
+     MAIN CONTENT
+═══════════════════════════════════ -->
+<main>
+
+  <!-- TOP ROW: 4 stat cards -->
+  <div class="grid-top">
+
+    <!-- Total Predictions -->
+    <div class="card">
+      <div class="card-title">Total Predictions</div>
+      <div class="stat-value stat-blue"
+           id="totalPred">--</div>
+      <div class="stat-sub">since startup</div>
+    </div>
+
+    <!-- Danger Alerts -->
+    <div class="card">
+      <div class="card-title">🔴 Danger Alerts</div>
+      <div class="stat-value stat-red"
+           id="dangerCount">--</div>
+      <div class="stat-sub">auto email sent</div>
+    </div>
+
+    <!-- Warning Alerts -->
+    <div class="card">
+      <div class="card-title">🟡 Warnings</div>
+      <div class="stat-value stat-yellow"
+           id="warningCount">--</div>
+      <div class="stat-sub">logged</div>
+    </div>
+
+    <!-- Safe Readings -->
+    <div class="card">
+      <div class="card-title">🟢 Safe Readings</div>
+      <div class="stat-value stat-green"
+           id="safeCount">--</div>
+      <div class="stat-sub">normal conditions</div>
+    </div>
+
+  </div>
+
+  <!-- MIDDLE ROW: Risk status + Sensors -->
+  <div class="grid-middle">
+
+    <!-- LEFT: Risk Status + Chart -->
+    <div class="card">
+      <div class="card-title">Live Risk Monitor</div>
+
+      <!-- Risk Status Box -->
+      <div class="risk-card risk-safe"
+           id="riskCard">
+        <div class="risk-icon" id="riskIcon">🟢</div>
+        <div class="risk-label" id="riskLabel">
+          SAFE
+        </div>
+        <div class="risk-action" id="riskAction">
+          Normal Conditions
+        </div>
+      </div>
+
+      <!-- Confidence -->
+      <div style="margin-top:16px;">
+        <div style="display:flex;
+                    justify-content:space-between;
+                    font-size:12px;
+                    color:var(--text-muted);">
+          <span>Confidence</span>
+          <span id="confValue">--%</span>
+        </div>
+        <div class="confidence-bar-bg">
+          <div class="confidence-bar-fill"
+               id="confBar" style="width:0%">
+          </div>
+        </div>
+        <div style="font-size:11px;
+                    color:var(--text-muted);">
+          Band:
+          <span id="confBand"
+                style="color:var(--accent)">--
+          </span>
+        </div>
+      </div>
+
+      <!-- Risk History Chart -->
+      <div style="margin-top:16px;">
+        <div class="card-title">
+          Risk History (last 20 readings)
+        </div>
+        <div class="chart-container">
+          <canvas id="riskChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Sensor Values + Alerts -->
+    <div style="display:flex;
+                flex-direction:column;
+                gap:16px;">
+
+      <!-- Sensor Values -->
+      <div class="card">
+        <div class="card-title">
+          Live Sensor Values
+        </div>
+        <div class="sensor-grid">
+
+          <div class="sensor-item">
+            <div class="sensor-name">
+              Soil Moisture
+            </div>
+            <div class="sensor-val"
+                 id="svMoisture">--</div>
+            <div class="sensor-bar">
+              <div class="sensor-bar-fill"
+                   id="sbMoisture"
+                   style="width:0%;
+                          background:var(--green)">
+              </div>
+            </div>
+          </div>
+
+          <div class="sensor-item">
+            <div class="sensor-name">
+              Accel Magnitude
+            </div>
+            <div class="sensor-val"
+                 id="svMagnitude">--</div>
+            <div class="sensor-bar">
+              <div class="sensor-bar-fill"
+                   id="sbMagnitude"
+                   style="width:0%;
+                          background:var(--blue)">
+              </div>
+            </div>
+          </div>
+
+          <div class="sensor-item">
+            <div class="sensor-name">
+              Moisture Change
+            </div>
+            <div class="sensor-val"
+                 id="svChange">--</div>
+            <div class="sensor-bar">
+              <div class="sensor-bar-fill"
+                   id="sbChange"
+                   style="width:0%;
+                          background:var(--purple)">
+              </div>
+            </div>
+          </div>
+
+          <div class="sensor-item">
+            <div class="sensor-name">
+              Vibration
+            </div>
+            <div class="sensor-val"
+                 id="svVibration">--</div>
+            <div class="sensor-bar">
+              <div class="sensor-bar-fill"
+                   id="sbVibration"
+                   style="width:0%">
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Alert Summary -->
+      <div class="card">
+        <div class="card-title">Alert Summary</div>
+
+        <div class="alert-row">
+          <span>
+            <span class="alert-dot"
+                  style="background:var(--red)">
+            </span>
+            Danger Events
+          </span>
+          <strong id="alertDanger"
+                  style="color:var(--red)">0</strong>
+        </div>
+
+        <div class="alert-row">
+          <span>
+            <span class="alert-dot"
+                  style="background:var(--yellow)">
+            </span>
+            Warning Events
+          </span>
+          <strong id="alertWarning"
+                  style="color:var(--yellow)">0</strong>
+        </div>
+
+        <div class="alert-row">
+          <span>
+            <span class="alert-dot"
+                  style="background:var(--green)">
+            </span>
+            Safe Readings
+          </span>
+          <strong id="alertSafe"
+                  style="color:var(--green)">0</strong>
+        </div>
+
+        <div class="alert-row">
+          <span>
+            <span class="alert-dot"
+                  style="background:var(--purple)">
+            </span>
+            Anomalies Detected
+          </span>
+          <strong id="alertAnomaly"
+                  style="color:var(--purple)">0</strong>
+        </div>
+
+      </div>
+
+      <!-- Model Info -->
+      <div class="card">
+        <div class="card-title">Model Status</div>
+        <div style="font-size:12px;
+                    color:var(--text-muted);
+                    line-height:1.8;">
+          <div>Model:
+            <span style="color:var(--green)">
+              Random Forest v2
+            </span>
+          </div>
+          <div>Accuracy:
+            <span style="color:var(--green)">
+              99.75%
+            </span>
+          </div>
+          <div>DANGER Recall:
+            <span style="color:var(--green)">
+              100%
+            </span>
+          </div>
+          <div>Features:
+            <span style="color:var(--accent)">
+              8 engineered
+            </span>
+          </div>
+          <div>LSTM:
+            <span style="color:var(--yellow)">
+              Experimental
+            </span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- BOTTOM ROW: Prediction History Table -->
+  <div class="grid-bottom">
+    <div class="card">
+      <div class="card-title">
+        Recent Predictions (last 10)
+      </div>
+      <table class="pred-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Time</th>
+            <th>Risk Level</th>
+            <th>Confidence</th>
+            <th>Band</th>
+            <th>Anomaly</th>
+            <th>Moisture</th>
+            <th>Magnitude</th>
+          </tr>
+        </thead>
+        <tbody id="predTable">
+          <tr>
+            <td colspan="8"
+                style="text-align:center;
+                       color:var(--text-muted);
+                       padding:20px;">
+              Waiting for predictions...
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  LandSense ML — AI-Powered Landslide Early
+  Warning System 2026
+</footer>
+
+<!-- ═══════════════════════════════════
+     JAVASCRIPT
+═══════════════════════════════════ -->
+<script>
+// ─── State ────────────────────────────────
+const API_BASE = 'http://127.0.0.1:5000';
+const UPDATE_INTERVAL = 5000; // 5 seconds
+let predHistory = [];
+let riskHistory = [];
+let predCount = 0;
+let timer = 5;
+let timerInterval;
+let chartInstance = null;
+
+// Sample test readings (rotated for demo)
+const DEMO_READINGS = [
+  // Safe readings
+  {accel_x:2048,accel_y:2050,accel_z:2048,
+   moisture:1800,vibration:0},
+  {accel_x:2060,accel_y:2055,accel_z:2048,
+   moisture:1950,vibration:0},
+  {accel_x:2045,accel_y:2048,accel_z:2048,
+   moisture:2100,vibration:0},
+  // Warning readings
+  {accel_x:2200,accel_y:2250,accel_z:2048,
+   moisture:2900,vibration:0},
+  {accel_x:2300,accel_y:2400,accel_z:2048,
+   moisture:3100,vibration:0},
+  // Danger reading
+  {accel_x:2700,accel_y:2800,accel_z:2048,
+   moisture:3900,vibration:1},
+];
+
+let demoIdx = 0;
+
+// ─── Risk Config ──────────────────────────
+const RISK_CONFIG = {
+  'SAFE': {
+    cardClass: 'risk-safe',
+    icon: '🟢',
+    action: 'Normal Conditions'
+  },
+  'WARNING': {
+    cardClass: 'risk-warning',
+    icon: '🟡',
+    action: 'Monitor Closely'
+  },
+  'DANGER': {
+    cardClass: 'risk-danger',
+    icon: '🔴',
+    action: '⚠️ EVACUATE NOW'
+  }
+};
+
+// ─── Fetch Prediction ─────────────────────
+async function fetchPrediction() {
+  const reading = DEMO_READINGS[demoIdx % DEMO_READINGS.length];
+  demoIdx++;
+
+  try {
+    const resp = await fetch(
+      `${API_BASE}/predict`,
+      {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify(reading)
+      }
+    );
+    const data = await resp.json();
+
+    if (data.success) {
+      updateDashboard(data, reading);
+      setConnected(true);
+    }
+  } catch(e) {
+    setConnected(false);
+    console.warn('API not reachable:', e.message);
+  }
+}
+
+// ─── Fetch Stats ──────────────────────────
+async function fetchStats() {
+  try {
+    const resp = await fetch(`${API_BASE}/stats`);
+    const data = await resp.json();
+    updateStats(data);
+  } catch(e) {}
+}
+
+// ─── Update Dashboard ─────────────────────
+function updateDashboard(data, reading) {
+  predCount++;
+
+  // Risk card
+  const risk = data.risk_level;
+  const cfg = RISK_CONFIG[risk];
+  const card = document.getElementById('riskCard');
+  card.className = `risk-card ${cfg.cardClass}`;
+
+  document.getElementById('riskIcon').textContent =
+    cfg.icon;
+  document.getElementById('riskLabel').textContent =
+    risk;
+  document.getElementById('riskAction').textContent =
+    data.action_required || cfg.action;
+
+  // Confidence
+  const conf = data.confidence || 0;
+  document.getElementById('confValue').textContent =
+    `${conf}%`;
+  document.getElementById('confBar').style.width =
+    `${conf}%`;
+  document.getElementById('confBand').textContent =
+    data.confidence_band || '--';
+
+  // Sensor values
+  const feat = data.calculated_features || {};
+  const moisture = reading.moisture;
+  const magnitude = feat.accel_magnitude || 0;
+  const change = Math.abs(feat.moisture_change || 0);
+
+  document.getElementById('svMoisture').textContent =
+    moisture.toFixed(0);
+  document.getElementById('svMagnitude').textContent =
+    magnitude.toFixed(0);
+  document.getElementById('svChange').textContent =
+    (feat.moisture_change || 0).toFixed(0);
+  document.getElementById('svVibration').textContent =
+    reading.vibration ? 'DETECTED' : 'None';
+
+  // Sensor bars
+  const moistPct = Math.min(moisture/4095*100, 100);
+  const magPct = Math.min(
+    (magnitude-3400)/1200*100, 100
+  );
+  const changePct = Math.min(change/2000*100, 100);
+
+  setBarPct('sbMoisture', moistPct,
+    moistPct > 85 ? 'var(--red)' :
+    moistPct > 68 ? 'var(--yellow)' :
+    'var(--green)'
+  );
+  setBarPct('sbMagnitude', Math.max(magPct, 0),
+    'var(--blue)');
+  setBarPct('sbChange', changePct, 'var(--purple)');
+  setBarPct('sbVibration', reading.vibration ? 100 : 0,
+    reading.vibration ? 'var(--red)' : 'var(--green)'
+  );
+
+  // Vibration color
+  document.getElementById('svVibration').style.color =
+    reading.vibration ?
+    'var(--red)' : 'var(--green)';
+
+  // Risk history for chart
+  const riskCode = data.risk_code;
+  riskHistory.push(riskCode);
+  if (riskHistory.length > 20) riskHistory.shift();
+  updateChart();
+
+  // Prediction table
+  const now = new Date();
+  const timeStr =
+    now.toLocaleTimeString('en-IN', {hour12:false});
+
+  predHistory.unshift({
+    num: predCount,
+    time: timeStr,
+    risk: risk,
+    conf: conf,
+    band: data.confidence_band || '--',
+    anomaly: data.is_anomaly ? '⚠️ Yes' : 'No',
+    moisture: moisture.toFixed(0),
+    magnitude: magnitude.toFixed(0)
+  });
+  if (predHistory.length > 10) predHistory.pop();
+  updateTable();
+}
+
+// ─── Update Stats ─────────────────────────
+function updateStats(data) {
+  const set = (id, val) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = val;
+  };
+
+  set('totalPred', data.total_predictions || 0);
+  set('dangerCount', data.danger_alerts || 0);
+  set('warningCount', data.warning_alerts || 0);
+  set('safeCount', data.safe_readings || 0);
+  set('alertDanger', data.danger_alerts || 0);
+  set('alertWarning', data.warning_alerts || 0);
+  set('alertSafe', data.safe_readings || 0);
+  set('alertAnomaly', data.anomalies_detected || 0);
+}
+
+// ─── Update Chart ─────────────────────────
+function updateChart() {
+  const canvas = document.getElementById('riskChart');
+  const ctx = canvas.getContext('2d');
+  const w = canvas.offsetWidth;
+  const h = 200;
+  canvas.width = w;
+  canvas.height = h;
+
+  ctx.clearRect(0, 0, w, h);
+
+  if (riskHistory.length < 2) return;
+
+  const pad = { t:20, r:20, b:30, l:40 };
+  const chartW = w - pad.l - pad.r;
+  const chartH = h - pad.t - pad.b;
+  const n = riskHistory.length;
+
+  // Grid
+  ctx.strokeStyle = '#30363d';
+  ctx.lineWidth = 0.5;
+  [0, 1, 2].forEach(level => {
+    const y = pad.t + chartH -
+              (level / 2) * chartH;
+    ctx.beginPath();
+    ctx.moveTo(pad.l, y);
+    ctx.lineTo(pad.l + chartW, y);
+    ctx.stroke();
+
+    // Labels
+    ctx.fillStyle = '#8b949e';
+    ctx.font = '10px Segoe UI';
+    ctx.fillText(
+      ['SAFE','WARN','DANGER'][level],
+      2, y + 4
+    );
+  });
+
+  // Line
+  ctx.lineWidth = 2.5;
+  ctx.lineJoin = 'round';
+  ctx.lineCap = 'round';
+
+  riskHistory.forEach((val, i) => {
+    const x = pad.l + (i/(n-1)) * chartW;
+    const y = pad.t + chartH -
+              (val/2) * chartH;
+
+    if (i === 0) {
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+    } else {
+      ctx.lineTo(x, y);
+    }
+  });
+
+  // Gradient stroke
+  const grad = ctx.createLinearGradient(
+    pad.l, 0, pad.l + chartW, 0
+  );
+  grad.addColorStop(0, '#388bfd');
+  grad.addColorStop(1, '#3fb950');
+  ctx.strokeStyle = grad;
+  ctx.stroke();
+
+  // Dots
+  riskHistory.forEach((val, i) => {
+    const x = pad.l + (i/(n-1)) * chartW;
+    const y = pad.t + chartH -
+              (val/2) * chartH;
+
+    ctx.beginPath();
+    ctx.arc(x, y, 4, 0, Math.PI*2);
+    ctx.fillStyle =
+      val===2 ? '#f85149' :
+      val===1 ? '#d29922' : '#3fb950';
+    ctx.fill();
+  });
+}
+
+// ─── Update Table ─────────────────────────
+function updateTable() {
+  const tbody = document.getElementById('predTable');
+  const BADGE = {
+    'SAFE':    'badge-safe',
+    'WARNING': 'badge-warning',
+    'DANGER':  'badge-danger'
+  };
+
+  tbody.innerHTML = predHistory.map(p => `
+    <tr>
+      <td style="color:var(--text-muted)">${p.num}</td>
+      <td style="color:var(--text-muted)">${p.time}</td>
+      <td>
+        <span class="badge ${BADGE[p.risk]}">
+          ${p.risk}
+        </span>
+      </td>
+      <td>${p.conf}%</td>
+      <td style="color:var(--accent);
+                 font-size:11px">${p.band}</td>
+      <td style="color:${
+        p.anomaly.includes('Yes') ?
+        'var(--yellow)' : 'var(--text-muted)'
+      }">${p.anomaly}</td>
+      <td>${p.moisture}</td>
+      <td>${p.magnitude}</td>
+    </tr>
+  `).join('');
+}
+
+// ─── Helpers ──────────────────────────────
+function setBarPct(id, pct, color) {
+  const el = document.getElementById(id);
+  if (el) {
+    el.style.width = `${Math.max(0,Math.min(pct,100))}%`;
+    el.style.background = color;
+  }
+}
+
+function setConnected(online) {
+  const dot = document.getElementById('connDot');
+  const txt = document.getElementById('connText');
+  if (online) {
+    dot.className = 'conn-dot';
+    txt.textContent = 'API Connected';
+    txt.style.color = 'var(--green)';
+  } else {
+    dot.className = 'conn-dot offline';
+    txt.textContent = 'API Offline';
+    txt.style.color = 'var(--red)';
+  }
+}
+
+// ─── Countdown Timer ──────────────────────
+function startTimer() {
+  timer = 5;
+  clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
+    timer--;
+    document.getElementById('timer').textContent =
+      `Next update: ${timer}s`;
+    if (timer <= 0) {
+      timer = 5;
+    }
+  }, 1000);
+}
+
+// ─── Main Loop ────────────────────────────
+async function mainLoop() {
+  await fetchPrediction();
+  await fetchStats();
+  startTimer();
+}
+
+// ─── Init ─────────────────────────────────
+window.addEventListener('load', () => {
+  mainLoop();
+  setInterval(mainLoop, UPDATE_INTERVAL);
+});
+
+window.addEventListener('resize', updateChart);
+</script>
+
+</body>
+</html>

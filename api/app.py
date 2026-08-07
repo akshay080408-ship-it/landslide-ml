@@ -6,7 +6,8 @@
 #       add logging, rate limiting
 # ============================================
 
-from flask import Flask, request, jsonify
+from flask import Flask,request, jsonify
+from flask_cors import CORS
 import joblib
 import pandas as pd
 import numpy as np
@@ -20,12 +21,17 @@ import time
 # STEP 1: SETUP LOGGING
 # WHY: Track every request for debugging
 # ════════════════════════════════════════════
+LOG_PATH = os.path.join(
+    os.path.dirname(os.path.abspath(__file__)),
+    'api_log.txt'
+)
+
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler('../api/api_log.txt'),
-        logging.StreamHandler()  # Also print to terminal
+        logging.FileHandler(LOG_PATH),
+        logging.StreamHandler()
     ]
 )
 logger = logging.getLogger('LandSenseAPI')
@@ -35,6 +41,7 @@ print("   DAY 19 — HARDENED FLASK API")
 print("="*55)
 
 app = Flask(__name__)
+CORS(app)  # Allow cross-origin requests for testing
 
 # ════════════════════════════════════════════
 # STEP 2: LOAD MODEL (same as Day 18)
