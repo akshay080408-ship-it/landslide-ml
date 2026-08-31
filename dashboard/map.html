@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>LandSense ML — NER Risk Map</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-map:       #12140f;
+    --bg-panel:     #181b14;
+    --bg-raised:    #1f2318;
+    --line:         #333829;
+    --line-soft:    #262a1d;
+    --paper:        #ece7d8;
+    --paper-dim:    #8d8f79;
+    --moss:         #7a9b6e;
+    --ochre:        #c98a3b;
+    --clay:         #b3483a;
+    --brass:        #ab8a54;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background: var(--bg-map);
+    color: var(--paper);
+    font-family: 'IBM Plex Sans', sans-serif;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  .mono { font-family: 'IBM Plex Mono', monospace; }
+  .contour-bg {
+    background-image: repeating-radial-gradient(
+      circle at 15% 20%,
+      transparent 0, transparent 26px,
+      rgba(236,231,216,0.025) 27px, transparent 28px
+    );
+  }
+  header {
+    background: var(--bg-panel);
+    border-bottom: 1px solid var(--line);
+    padding: 16px 24px;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+  }
+  .logo { font-family: 'Space Grotesk', sans-serif; font-size: 19px; font-weight: 700; letter-spacing: 0.2px; }
+  .logo span { color: var(--moss); }
+  .header-sub { font-size: 11px; color: var(--paper-dim); margin-top: 2px; }
+  #apiStatus { font-size: 11px; color: var(--paper-dim); }
+  #apiStatus.ok::before { content: '●'; color: var(--moss); margin-right: 5px; }
+  #apiStatus.bad::before { content: '●'; color: var(--clay); margin-right: 5px; }
+  .layout { flex: 1; display: flex; overflow: hidden; }
+  #map { flex: 1; background: var(--bg-map); }
+  aside {
+    width: 310px;
+    background: var(--bg-panel);
+    border-left: 1px solid var(--line);
+    overflow-y: auto;
+    padding: 20px;
+  }
+  aside h2 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 1px;
+    color: var(--paper-dim); margin-bottom: 10px; padding-bottom: 6px;
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .section { margin-bottom: 22px; }
+  .elevation-readout { display: flex; border: 1px solid var(--line); border-radius: 4px; overflow: hidden; }
+  .readout-cell { flex: 1; padding: 10px 6px; text-align: center; border-right: 1px solid var(--line); }
+  .readout-cell:last-child { border-right: none; }
+  .readout-cell .count { font-family: 'IBM Plex Mono', monospace; font-size: 22px; font-weight: 600; line-height: 1; }
+  .readout-cell .label { font-size: 9px; text-transform: uppercase; letter-spacing: 0.6px; color: var(--paper-dim); margin-top: 4px; }
+  .readout-cell.safe .count    { color: var(--moss); }
+  .readout-cell.warning .count { color: var(--ochre); }
+  .readout-cell.danger .count  { color: var(--clay); }
+  .node-row { display: flex; align-items: flex-start; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--line-soft); cursor: pointer; }
+  .node-row:last-child { border-bottom: none; }
+  .node-row:hover .node-name { color: var(--paper); text-decoration: underline; text-underline-offset: 3px; }
+  .status-dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 5px; flex-shrink: 0; }
+  .status-dot.safe    { background: var(--moss); }
+  .status-dot.warning { background: var(--ochre); }
+  .status-dot.danger  { background: var(--clay); box-shadow: 0 0 6px var(--clay); }
+  .node-name { font-size: 13px; font-weight: 500; color: var(--paper-dim); }
+  .node-meta { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--paper-dim); margin-top: 2px; }
+  .node-meta .risk-safe    { color: var(--moss); }
+  .node-meta .risk-warning { color: var(--ochre); }
+  .node-meta .risk-danger  { color: var(--clay); }
+  .source-tag { font-size: 9px; color: var(--brass); border: 1px solid var(--line); border-radius: 3px; padding: 1px 5px; margin-left: 6px; letter-spacing: 0.4px; }
+  .alert-row { padding: 8px 0; border-bottom: 1px solid var(--line-soft); font-size: 11.5px; }
+  .alert-row:last-child { border-bottom: none; }
+  .alert-row .alert-node { font-family: 'IBM Plex Mono', monospace; color: var(--clay); font-weight: 600; }
+  .alert-row .alert-meta { color: var(--paper-dim); margin-top: 2px; }
+  .alert-row .sent    { color: var(--moss); }
+  .alert-row .blocked { color: var(--ochre); }
+  .empty-note { color: var(--paper-dim); font-size: 12px; font-style: italic; }
+  .priority-row {
+    display: flex; gap: 10px; align-items: flex-start;
+    padding: 8px 0; border-bottom: 1px solid var(--line-soft); font-size: 12px;
+  }
+  .priority-row:last-child { border-bottom: none; }
+  .priority-rank {
+    font-family: 'IBM Plex Mono', monospace; font-weight: 600;
+    color: var(--clay); flex-shrink: 0; width: 20px;
+  }
+  .priority-loc { font-weight: 500; }
+  .priority-score { font-family: 'IBM Plex Mono', monospace; color: var(--paper-dim); font-size: 10.5px; }
+  .priority-reasons { color: var(--paper-dim); font-size: 10.5px; margin-top: 2px; }
+  .hint { font-size: 10.5px; color: var(--paper-dim); line-height: 1.4; }
+  .weather-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--line-soft); font-size: 12px; }
+  .weather-row:last-child { border-bottom: none; }
+  .weather-row .rain-val { font-family: 'IBM Plex Mono', monospace; }
+  .weather-row .rain-val.LOW      { color: var(--paper-dim); }
+  .weather-row .rain-val.MODERATE { color: var(--ochre); }
+  .weather-row .rain-val.HEAVY    { color: var(--clay); }
+  .report-row { padding: 8px 0; border-bottom: 1px solid var(--line-soft); font-size: 11.5px; }
+  .report-row:last-child { border-bottom: none; }
+  .report-row .report-loc { font-weight: 500; }
+  .report-row .report-meta { color: var(--paper-dim); margin-top: 2px; }
+  .road-badge { font-family: 'IBM Plex Mono', monospace; font-size: 9px; border-radius: 3px; padding: 1px 5px; margin-left: 6px; }
+  .road-badge.OPEN    { color: var(--moss); border: 1px solid var(--moss); }
+  .road-badge.CAUTION { color: var(--ochre); border: 1px solid var(--ochre); }
+  .road-badge.BLOCKED { color: var(--clay); border: 1px solid var(--clay); }
+  .leaflet-popup-content-wrapper { background: var(--bg-raised); color: var(--paper); border-radius: 4px; }
+  .leaflet-popup-tip { background: var(--bg-raised); }
+  .leaflet-popup-content { font-family: 'IBM Plex Sans', sans-serif; font-size: 12.5px; line-height: 1.6; }
+  .leaflet-popup-content b.mono { font-family: 'IBM Plex Mono', monospace; }
+  .leaflet-control-layers {
+    background: var(--bg-panel) !important;
+    border: 1px solid var(--line) !important;
+    color: var(--paper) !important;
+  }
+  .leaflet-control-layers-toggle { filter: invert(0.85); }
+  .leaflet-control-layers label { font-size: 12px; color: var(--paper); }
+  @keyframes pulseMarker { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+</style>
+</head>
+<body>
+
+<header class="contour-bg">
+  <div>
+    <div class="logo">LandSense<span>ML</span> — NER Risk Map</div>
+    <div class="header-sub">Live landslide risk across monitored locations · polling every 5s</div>
+  </div>
+  <div id="apiStatus">Connecting to API…</div>
+</header>
+
+<div class="layout">
+  <div id="map"></div>
+  <aside class="contour-bg">
+
+    <div class="section">
+      <h2>Emergency Response Priority</h2>
+      <div class="hint" style="margin-bottom:8px;">Ranked by urgency — sensor risk + citizen reports combined. Transparent scoring, not a black box.</div>
+      <div id="priorityList"><div class="empty-note">No urgent items.</div></div>
+    </div>
+
+    <div class="section">
+      <h2>Node Summary</h2>
+      <div class="elevation-readout">
+        <div class="readout-cell safe"><div class="count" id="countSafe">0</div><div class="label">Safe</div></div>
+        <div class="readout-cell warning"><div class="count" id="countWarning">0</div><div class="label">Warn</div></div>
+        <div class="readout-cell danger"><div class="count" id="countDanger">0</div><div class="label">Danger</div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Monitored Nodes — by severity</h2>
+      <div id="nodeList"></div>
+    </div>
+
+    <div class="section">
+      <h2>Recent Danger Alerts</h2>
+      <div id="alertList"><div class="empty-note">No alerts yet.</div></div>
+    </div>
+
+    <div class="section">
+      <h2>Historical Records</h2>
+      <div class="hint">8 documented events across Mizoram, Meghalaya &amp; Assam (2016–2024) — small grey diamonds on map. Each is individually cited from peer-reviewed/verified sources (click a marker). Full national inventory: GSI Bhukosh.</div>
+    </div>
+
+    <div class="section">
+      <h2>Terrain — <span style="color:var(--moss);">real data</span></h2>
+      <div class="hint" style="margin-bottom:8px;">Elevation + coarse slope estimate from Open-Meteo (Copernicus DEM, ~90m resolution).</div>
+      <div id="terrainList"></div>
+    </div>
+
+    <div class="section">
+      <h2>Rainfall &amp; Risk Trend — <span style="color:var(--moss);">real data</span></h2>
+      <div class="hint" style="margin-bottom:8px;">Live precipitation + 3-day forecast via Open-Meteo (not IMD-branded, but real meteorological data). Trend combines forecast with current model risk via a transparent rule, not a trained predictor.</div>
+      <div id="weatherList"></div>
+    </div>
+
+    <div class="section">
+      <h2>Recent Field Reports</h2>
+      <div id="reportList"><div class="empty-note">No reports yet.</div></div>
+    </div>
+
+  </aside>
+</div>
+
+<script>
+const API_BASE = 'http://127.0.0.1:5000';
+const UPDATE_INTERVAL = 5000;
+
+const RISK_COLOR = { SAFE: '#7a9b6e', WARNING: '#c98a3b', DANGER: '#b3483a' };
+const RISK_CLASS = { SAFE: 'safe', WARNING: 'warning', DANGER: 'danger' };
+const SEVERITY_ORDER = { DANGER: 0, WARNING: 1, SAFE: 2 };
+
+const map = L.map('map', { zoomControl: true, worldCopyJump: false }).setView([25.8, 92.5], 6);
+
+const streetLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '&copy; OpenStreetMap contributors',
+  maxZoom: 12,
+  minZoom: 5,
+  noWrap: true
+});
+
+// Real satellite imagery — NASA GIBS (Global Imagery Browse
+// Services), MODIS Terra true-color, free & no API key.
+//
+// BUG FIX: GIBS's docs suggest a literal 'default' time value
+// is supported, but in practice the tile server 404s on it —
+// confirmed by testing directly. A real date is required.
+// Using "2 days ago" (not today) gives satellite processing
+// time to catch up — same-day imagery is often incomplete.
+//
+// HONEST CAVEAT: NER is deep in monsoon season right now —
+// true-color optical imagery is very likely to show heavy
+// cloud cover, not bare terrain. That's a real limitation of
+// optical satellite imagery in this season (radar/SAR would
+// see through clouds but GIBS doesn't offer that layer
+// publicly) — worth saying plainly if asked, not hidden.
+// NOTE: GIBS's URL segment order is z/y/x (TileMatrix/Row/Col),
+// NOT the usual z/x/y — this {y}/{x} order is intentional.
+function getGibsDate() {
+  const d = new Date();
+  d.setDate(d.getDate() - 2);
+  return d.toISOString().split('T')[0]; // YYYY-MM-DD
+}
+const satelliteLayer = L.tileLayer(
+  `https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/MODIS_Terra_CorrectedReflectance_TrueColor/default/${getGibsDate()}/GoogleMapsCompatible_Level9/{z}/{y}/{x}.jpg`,
+  {
+    attribution: 'Imagery: NASA GIBS / MODIS Terra (true color, ~2 days delayed)',
+    maxZoom: 9,
+    minZoom: 5,
+    noWrap: true
+  }
+);
+
+// Risk heatmap — a density/severity overlay on top of the
+// point markers, weighted by risk level so DANGER nodes pull
+// the heat gradient toward red more than WARNING/SAFE ones do.
+// Updated live from the same node poll, not separately fetched.
+const HEAT_WEIGHT = { DANGER: 1.0, WARNING: 0.5, SAFE: 0.15 };
+const heatLayer = L.heatLayer([], { radius: 45, blur: 35, maxZoom: 9 });
+
+streetLayer.addTo(map);
+L.control.layers(
+  { 'Street map': streetLayer, 'Satellite (NASA GIBS, real-time)': satelliteLayer },
+  { 'Risk heatmap': heatLayer },
+  { collapsed: false, position: 'topright' }
+).addTo(map);
+
+map.setMaxBounds([[18, 82], [33, 100]]);
+
+const markers = {};
+const roadMarkers = {}; // report.id -> Leaflet marker (road-status pins)
+let latestNodes = {};
+
+function makeIcon(color, pulsing) {
+  return L.divIcon({
+    className: '',
+    html: `<div style="
+      width:16px;height:16px;border-radius:50%;
+      background:${color};border:2px solid #12140f;
+      box-shadow:0 0 6px ${color};
+      ${pulsing ? 'animation:pulseMarker 1.2s infinite;' : ''}
+    "></div>`,
+    iconSize: [16, 16],
+    iconAnchor: [8, 8]
+  });
+}
+
+// Square marker (visually distinct from the round sensor-node
+// markers) for road-status reports coming from citizens/field
+// officers, not from the ML model.
+const ROAD_COLOR = { OPEN: '#7a9b6e', CAUTION: '#c98a3b', BLOCKED: '#b3483a' };
+function makeRoadIcon(color) {
+  return L.divIcon({
+    className: '',
+    html: `<div style="
+      width:14px;height:14px;
+      background:${color};border:2px solid #12140f;
+      transform:rotate(45deg);
+      box-shadow:0 0 5px ${color};
+    "></div>`,
+    iconSize: [14, 14],
+    iconAnchor: [7, 7]
+  });
+}
+
+// Small diamond marker for historical (past, non-live) events —
+// deliberately muted/grey since these are records, not current risk.
+function makeHistoricalIcon() {
+  return L.divIcon({
+    className: '',
+    html: `<div style="
+      width:10px;height:10px;
+      background:#8d8f79;border:1.5px solid #12140f;
+      transform:rotate(45deg);
+      opacity:0.85;
+    "></div>`,
+    iconSize: [10, 10],
+    iconAnchor: [5, 5]
+  });
+}
+
+function updateMarker(node) {
+  const color = RISK_COLOR[node.risk_level] || '#8d8f79';
+  const pulsing = node.risk_level === 'DANGER';
+
+  if (!markers[node.node_id]) {
+    markers[node.node_id] = L.marker([node.lat, node.lng], { icon: makeIcon(color, pulsing) }).addTo(map);
+    markers[node.node_id].on('click', () => map.setView([node.lat, node.lng], 9));
+  }
+  const marker = markers[node.node_id];
+  marker.setIcon(makeIcon(color, pulsing));
+  marker.bindPopup(`
+    <b>${node.name}</b><br>
+    Risk: <b class="mono" style="color:${color}">${node.risk_level}</b><br>
+    Confidence: <span class="mono">${node.confidence}%</span><br>
+    Source: ${node.source}<br>
+    Updated: <span class="mono">${new Date(node.last_updated).toLocaleTimeString()}</span>
+  `);
+}
+
+function renderNodeList() {
+  const nodes = Object.values(latestNodes)
+    .sort((a, b) => (SEVERITY_ORDER[a.risk_level] ?? 3) - (SEVERITY_ORDER[b.risk_level] ?? 3));
+
+  const el = document.getElementById('nodeList');
+  el.innerHTML = nodes.map(n => {
+    const cls = RISK_CLASS[n.risk_level] || '';
+    return `
+      <div class="node-row" onclick='window.__focusNode(${JSON.stringify(n.node_id)})'>
+        <div class="status-dot ${cls}"></div>
+        <div>
+          <div class="node-name">${n.name}<span class="source-tag">${n.source}</span></div>
+          <div class="node-meta">
+            <span class="risk-${cls}">${n.risk_level}</span> · ${n.confidence}% confidence
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+window.__focusNode = (nodeId) => {
+  const n = latestNodes[nodeId];
+  if (n) { map.setView([n.lat, n.lng], 9); markers[nodeId].openPopup(); }
+};
+
+function updateSummaryCounts() {
+  let safe = 0, warning = 0, danger = 0;
+  Object.values(latestNodes).forEach(n => {
+    if (n.risk_level === 'SAFE') safe++;
+    else if (n.risk_level === 'WARNING') warning++;
+    else if (n.risk_level === 'DANGER') danger++;
+  });
+  document.getElementById('countSafe').textContent = safe;
+  document.getElementById('countWarning').textContent = warning;
+  document.getElementById('countDanger').textContent = danger;
+}
+
+async function pollNodes() {
+  try {
+    const response = await fetch(`${API_BASE}/api/nodes`);
+    if (!response.ok) throw new Error(`status ${response.status}`);
+    const nodes = await response.json();
+    const statusEl = document.getElementById('apiStatus');
+    statusEl.textContent = 'API Connected';
+    statusEl.className = 'ok';
+
+    nodes.forEach(n => { latestNodes[n.node_id] = n; updateMarker(n); });
+    renderNodeList();
+    updateSummaryCounts();
+    updateHeatmap();
+  } catch (error) {
+    console.error('API Error:', error);
+    const statusEl = document.getElementById('apiStatus');
+    statusEl.textContent = 'API Not Reachable';
+    statusEl.className = 'bad';
+  }
+}
+
+function updateHeatmap() {
+  const points = Object.values(latestNodes).map(n => {
+    const weight = HEAT_WEIGHT[n.risk_level] ?? 0.15;
+    return [n.lat, n.lng, weight];
+  });
+  heatLayer.setLatLngs(points);
+}
+
+async function pollAlerts() {
+  try {
+    const resp = await fetch(`${API_BASE}/api/alerts`);
+    if (!resp.ok) throw new Error(`status ${resp.status}`);
+    const data = await resp.json();
+    renderAlerts(data.alerts || []);
+  } catch (e) {
+    console.error('Alert fetch failed:', e);
+  }
+}
+
+function renderAlerts(alerts) {
+  const el = document.getElementById('alertList');
+  if (!alerts.length) {
+    el.innerHTML = '<div class="empty-note">No alerts yet.</div>';
+    return;
+  }
+  el.innerHTML = alerts.slice(0, 10).map(a => {
+    const time = new Date(a.timestamp).toLocaleTimeString();
+    const emailNote = a.email_sent
+      ? '<span class="sent">email sent</span>'
+      : (a.email_blocked_by_cooldown ? '<span class="blocked">email cooldown</span>' : '');
+    const smsNote = a.sms_sent
+      ? '<span class="sent">sms sent</span>'
+      : (a.sms_blocked_by_cooldown ? '<span class="blocked">sms cooldown</span>' : '');
+    return `
+      <div class="alert-row">
+        <span class="alert-node">${a.node_id}</span>
+        <div class="alert-meta mono">${time} · ${a.confidence}% · ${emailNote} · ${smsNote}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+async function pollReports() {
+  try {
+    const resp = await fetch(`${API_BASE}/api/reports`);
+    if (!resp.ok) throw new Error(`status ${resp.status}`);
+    const data = await resp.json();
+    const reports = data.reports || [];
+    renderReports(reports);
+    updateRoadMarkers(reports);
+  } catch (e) {
+    console.error('Report fetch failed:', e);
+  }
+}
+
+// Plots each report that has BOTH a road_status and GPS
+// coordinates (GPS is optional on the form) as a square
+// marker, distinct from the round sensor-node markers.
+function updateRoadMarkers(reports) {
+  reports.forEach(r => {
+    if (!r.road_status || r.lat == null || r.lng == null) return;
+    const color = ROAD_COLOR[r.road_status] || '#8d8f79';
+
+    if (!roadMarkers[r.id]) {
+      roadMarkers[r.id] = L.marker([r.lat, r.lng], { icon: makeRoadIcon(color) }).addTo(map);
+    }
+    roadMarkers[r.id].setIcon(makeRoadIcon(color));
+    roadMarkers[r.id].bindPopup(`
+      <b>${r.location_name}</b><br>
+      Road status: <b class="mono" style="color:${color}">${r.road_status}</b><br>
+      Issue: ${r.issue_type.replace(/_/g, ' ')}<br>
+      Reported: <span class="mono">${new Date(r.timestamp).toLocaleTimeString()}</span>
+    `);
+    roadMarkers[r.id].on('click', () => window.__openReport(r.id));
+  });
+}
+
+function renderReports(reports) {
+  const el = document.getElementById('reportList');
+  if (!reports.length) {
+    el.innerHTML = '<div class="empty-note">No reports yet.</div>';
+    return;
+  }
+  el.innerHTML = reports.slice(0, 10).map(r => {
+    const time = new Date(r.timestamp).toLocaleTimeString();
+    const badge = r.road_status ? `<span class="road-badge ${r.road_status}">${r.road_status}</span>` : '';
+    return `
+      <div class="report-row" onclick="window.__openReport(${r.id})" style="cursor:pointer;">
+        <span class="report-loc">${r.location_name}</span>${badge}
+        <div class="report-meta mono">${r.issue_type.replace(/_/g, ' ')} · ${time}${r.has_photo ? ' · 📷' : ''}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ─── Report detail modal ─────────────────────
+// Fetches the single report WITH its photo on demand
+// (rather than always downloading every photo up front)
+// and shows it in a simple overlay.
+window.__openReport = async (reportId) => {
+  const overlay = document.getElementById('reportModalOverlay');
+  const body = document.getElementById('reportModalBody');
+  overlay.style.display = 'flex';
+  body.innerHTML = '<div class="empty-note">Loading…</div>';
+
+  try {
+    const resp = await fetch(`${API_BASE}/api/reports?include_photos=1`);
+    const data = await resp.json();
+    const r = (data.reports || []).find(x => x.id === reportId);
+    if (!r) { body.innerHTML = '<div class="empty-note">Report not found.</div>'; return; }
+
+    const badge = r.road_status ? `<span class="road-badge ${r.road_status}">${r.road_status}</span>` : '';
+    body.innerHTML = `
+      <div class="report-loc" style="font-size:15px;">${r.location_name} ${badge}</div>
+      <div class="report-meta mono" style="margin:6px 0 12px;">
+        ${r.issue_type.replace(/_/g, ' ')} · ${new Date(r.timestamp).toLocaleString()} · reported by ${r.reporter_name}
+      </div>
+      ${r.description ? `<div style="margin-bottom:12px;">${r.description}</div>` : ''}
+      ${r.photo_base64 ? `<img src="${r.photo_base64}" style="max-width:100%;border-radius:4px;">` : '<div class="empty-note">No photo attached.</div>'}
+      ${r.lat && r.lng ? `<div class="report-meta mono" style="margin-top:10px;">GPS: ${r.lat.toFixed(4)}, ${r.lng.toFixed(4)}</div>` : ''}
+    `;
+  } catch (e) {
+    body.innerHTML = '<div class="empty-note">Could not load report.</div>';
+  }
+};
+window.__closeReportModal = () => { document.getElementById('reportModalOverlay').style.display = 'none'; };
+
+async function pollWeather() {
+  try {
+    const resp = await fetch(`${API_BASE}/api/weather`);
+    if (!resp.ok) throw new Error(`status ${resp.status}`);
+    const data = await resp.json();
+    renderWeather(data.nodes || []);
+  } catch (e) {
+    console.error('Weather fetch failed:', e);
+  }
+}
+
+function renderWeather(nodes) {
+  const el = document.getElementById('weatherList');
+  if (!nodes.length) {
+    el.innerHTML = '<div class="empty-note">No weather data.</div>';
+    return;
+  }
+  const TREND_COLOR = { ESCALATING: 'var(--clay)', WATCH: 'var(--ochre)', STABLE: 'var(--moss)', UNKNOWN: 'var(--paper-dim)' };
+  el.innerHTML = nodes.map(w => {
+    const meta = NODE_REGISTRY_NAMES[w.node_id] || w.node_id;
+    const fallbackTag = w.source === 'DEMO_DATA'
+      ? '<span class="source-tag" style="color:var(--ochre);border-color:var(--ochre);">fallback</span>' : '';
+    const trendColor = TREND_COLOR[w.trend] || 'var(--paper-dim)';
+    return `
+      <div class="weather-row" style="flex-direction:column;align-items:stretch;gap:2px;">
+        <div style="display:flex;justify-content:space-between;">
+          <span>${meta}${fallbackTag}</span>
+          <span class="rain-val ${w.level}">${w.rainfall_mm_24h}mm/24h</span>
+        </div>
+        <div class="node-meta" style="display:flex;justify-content:space-between;">
+          <span>3d forecast: ${w.forecast_3d_mm ?? '—'}mm</span>
+          <span style="color:${trendColor};">${w.trend || ''}</span>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// Just for display names in the weather panel — mirrors
+// api/app.py's NODE_REGISTRY names (kept in sync manually
+// since this is a static demo list, not a live fetch).
+const NODE_REGISTRY_NAMES = {
+  shillong_01: 'Shillong',
+  itanagar_01: 'Itanagar',
+  kohima_01: 'Kohima',
+  aizawl_01: 'Aizawl',
+  gangtok_01: 'Gangtok'
+};
+
+// Historical events are static (not live), so load once
+// rather than on every 5s poll.
+async function loadHistoricalLandslides() {
+  try {
+    const resp = await fetch(`${API_BASE}/api/historical-landslides`);
+    if (!resp.ok) throw new Error(`status ${resp.status}`);
+    const data = await resp.json();
+    (data.events || []).forEach(ev => {
+      const marker = L.marker([ev.lat, ev.lng], { icon: makeHistoricalIcon() }).addTo(map);
+      marker.bindPopup(`
+        <b>Historical record — ${ev.date}</b><br>
+        ${ev.location}${ev.state ? ` (${ev.state})` : ''}<br>
+        Type: ${ev.type} · Trigger: ${ev.trigger}<br>
+        Fatalities: ${ev.fatalities}<br>
+        <span style="font-size:10px;color:var(--paper-dim);">Source: ${ev.source || data.citation}</span>
+        ${ev.reference_url ? `<br><a href="${ev.reference_url}" target="_blank" rel="noopener" style="font-size:11px;color:var(--moss);">View report & photos →</a>` : ''}
+      `);
+    });
+  } catch (e) {
+    console.error('Historical landslide fetch failed:', e);
+  }
+}
+
+// Terrain is static too — load once, not on the 5s poll.
+async function loadTerrain() {
+  try {
+    const resp = await fetch(`${API_BASE}/api/terrain`);
+    if (!resp.ok) throw new Error(`status ${resp.status}`);
+    const data = await resp.json();
+    renderTerrain(data.nodes || []);
+  } catch (e) {
+    console.error('Terrain fetch failed:', e);
+    document.getElementById('terrainList').innerHTML = '<div class="empty-note">Could not load terrain data.</div>';
+  }
+}
+
+function renderTerrain(nodes) {
+  const el = document.getElementById('terrainList');
+  if (!nodes.length) { el.innerHTML = '<div class="empty-note">No terrain data.</div>'; return; }
+  el.innerHTML = nodes.map(t => {
+    const name = NODE_REGISTRY_NAMES[t.node_id] || t.node_id;
+    if (t.status !== 'ok') {
+      return `<div class="weather-row"><span>${name}</span><span class="empty-note">unavailable</span></div>`;
+    }
+    return `
+      <div class="weather-row">
+        <span>${name}</span>
+        <span class="rain-val">${t.elevation_m}m · ${t.slope_deg}°</span>
+      </div>
+    `;
+  }).join('');
+}
+
+async function pollPriority() {
+  try {
+    const resp = await fetch(`${API_BASE}/api/priority`);
+    if (!resp.ok) throw new Error(`status ${resp.status}`);
+    const data = await resp.json();
+    renderPriority(data.queue || []);
+  } catch (e) {
+    console.error('Priority fetch failed:', e);
+  }
+}
+
+function renderPriority(queue) {
+  const el = document.getElementById('priorityList');
+  if (!queue.length) {
+    el.innerHTML = '<div class="empty-note">No urgent items right now.</div>';
+    return;
+  }
+  el.innerHTML = queue.slice(0, 6).map((item, i) => `
+    <div class="priority-row">
+      <span class="priority-rank">#${i + 1}</span>
+      <div>
+        <div class="priority-loc">${item.location} <span class="priority-score">score ${item.priority_score}</span></div>
+        <div class="priority-reasons">${item.reasons.join(' · ')}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function pollAll() { pollNodes(); pollAlerts(); pollReports(); pollWeather(); pollPriority(); }
+loadHistoricalLandslides();
+loadTerrain();
+pollAll();
+setInterval(pollAll, UPDATE_INTERVAL);
+</script>
+
+<div id="reportModalOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);align-items:center;justify-content:center;z-index:1000;" onclick="if(event.target===this)window.__closeReportModal()">
+  <div style="background:var(--bg-panel);border:1px solid var(--line);border-radius:6px;padding:20px;max-width:420px;width:90%;max-height:80vh;overflow-y:auto;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+      <span style="font-family:'Space Grotesk',sans-serif;font-size:13px;color:var(--paper-dim);text-transform:uppercase;letter-spacing:0.6px;">Field Report</span>
+      <span style="cursor:pointer;color:var(--paper-dim);" onclick="window.__closeReportModal()">✕</span>
+    </div>
+    <div id="reportModalBody"></div>
+  </div>
+</div>
+
+</body>
+</html>

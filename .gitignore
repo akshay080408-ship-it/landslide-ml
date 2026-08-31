@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+api/landsense.db
+api/api_log.txt
+*.lnk
+.env
+venv/
+.DS_Store
