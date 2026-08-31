@@ -76,7 +76,7 @@ Akshay Kumar — ECE , Vishnu Institute of Technology
 - [x] Day 24 — Build LSTM model
 - [x] Day 25 — Train LSTM
 - [x] Day 26 — Handle class imbalance
-- [ ] Day 27 — Confusion matrix analysis
+- [x] Day 27 — Confusion matrix analysis
 - [ ] Day 28 — Prediction confidence
 - [ ] Day 29 — Live prediction buffer
 - [ ] Day 30 — Compare RF vs LSTM
