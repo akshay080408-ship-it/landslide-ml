@@ -765,7 +765,8 @@
 ═══════════════════════════════════ -->
 <script>
 // ─── State ────────────────────────────────
-const API_BASE = 'http://127.0.0.1:5000';
+// Empty string = same-origin relative paths (see map.html for why)
+const API_BASE = '';
 const UPDATE_INTERVAL = 5000; // 5 seconds
 let predHistory = [];
 let riskHistory = [];

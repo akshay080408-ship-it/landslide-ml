@@ -1054,8 +1054,11 @@ def validate_input(data):
 # ROUTES
 # ════════════════════════════════════════════
 
-@app.route('/')
+@app.route('/api')
 def home():
+    # WAS also registered at '/' — but '/' is already claimed by
+    # serve_dashboard() above (which wins silently, making this
+    # dead code). Moved to /api so both are actually reachable.
     return jsonify({
         'project': 'LandSense ML API (Hardened v2)',
         'status': 'running',

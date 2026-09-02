@@ -22,7 +22,7 @@ and this script keeps simulating the rest.
 import time
 import requests
 
-API_URL = "http://127.0.0.1:5000/predict"
+API_URL = "https://YOUR-RENDER-URL.onrender.com/predict"  # replace with your real Render URL
 
 # Must match NODE_REGISTRY in api/app.py
 NODES = ["shillong_01", "itanagar_01", "kohima_01", "aizawl_01", "gangtok_01"]

@@ -204,7 +204,11 @@
 </div>
 
 <script>
-const API_BASE = 'http://127.0.0.1:5000';
+// Empty string = same-origin relative paths. Works locally
+// (Flask serves this file AND the API from 127.0.0.1:5000)
+// and on Render (both served from the same deployed domain)
+// with no hardcoded URL needed either way.
+const API_BASE = '';
 const UPDATE_INTERVAL = 5000;
 
 const RISK_COLOR = { SAFE: '#7a9b6e', WARNING: '#c98a3b', DANGER: '#b3483a' };
