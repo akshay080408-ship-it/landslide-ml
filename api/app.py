@@ -6,7 +6,7 @@
 #       add logging, rate limiting
 # ============================================
 
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 import joblib
 import pandas as pd
@@ -48,6 +48,65 @@ print("="*55)
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
+
+# ════════════════════════════════════════════
+# STATIC FILE SERVING (dashboards + assets)
+# WHY: Make map.html, report.html, and all
+# dashboard assets accessible directly from
+# Render, so mobile/desktop can visit the URL
+# and get the full working interface.
+# ════════════════════════════════════════════
+@app.route('/')
+def serve_dashboard():
+    """Serve map.html as the landing page"""
+    return send_from_directory(
+        os.path.join(os.path.dirname(__file__), '..', 'dashboard'),
+        'map.html'
+    )
+
+@app.route('/report')
+def serve_report():
+    """Serve report.html for field reporting"""
+    return send_from_directory(
+        os.path.join(os.path.dirname(__file__), '..', 'dashboard'),
+        'report.html'
+    )
+
+@app.route('/manifest.json')
+def serve_manifest():
+    """Serve PWA manifest"""
+    return send_from_directory(
+        os.path.join(os.path.dirname(__file__), '..', 'dashboard'),
+        'manifest.json'
+    )
+
+@app.route('/service-worker.js')
+def serve_sw():
+    """Serve service worker for offline support"""
+    return send_from_directory(
+        os.path.join(os.path.dirname(__file__), '..', 'dashboard'),
+        'service-worker.js'
+    )
+
+@app.route('/icon-<int:size>.png')
+def serve_icon(size):
+    """Serve PWA icons (192x192, 512x512)"""
+    filename = f'icon-{size}.png'
+    return send_from_directory(
+        os.path.join(os.path.dirname(__file__), '..', 'dashboard'),
+        filename
+    )
+
+@app.route('/<path:filename>')
+def serve_static(filename):
+    """Catch-all for any other static assets"""
+    try:
+        return send_from_directory(
+            os.path.join(os.path.dirname(__file__), '..', 'dashboard'),
+            filename
+        )
+    except:
+        return {'error': 'File not found'}, 404
 
 # ════════════════════════════════════════════
 # PERSISTENCE (SQLite)
