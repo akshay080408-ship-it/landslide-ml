@@ -1,683 +1,265 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>LandSense ML — Field Report</title>
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#181b14">
-<link rel="apple-touch-icon" href="icon-192.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --bg-map:       #12140f;
-    --bg-panel:     #181b14;
-    --bg-raised:    #1f2318;
-    --line:         #333829;
-    --line-soft:    #262a1d;
-    --paper:        #ece7d8;
-    --paper-dim:    #8d8f79;
-    --moss:         #7a9b6e;
-    --ochre:        #c98a3b;
-    --clay:         #b3483a;
-  }
-  * { margin:0; padding:0; box-sizing:border-box; }
-  body {
-    background: var(--bg-map);
-    color: var(--paper);
-    font-family: 'IBM Plex Sans', sans-serif;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 32px 16px 60px;
-  }
-  header { text-align: center; margin-bottom: 24px; }
-  .logo { font-family: 'Space Grotesk', sans-serif; font-size: 22px; font-weight: 700; }
-  .logo span { color: var(--moss); }
-  .subtitle { font-size: 12px; color: var(--paper-dim); margin-top: 4px; }
-
-  form {
-    width: 100%;
-    max-width: 440px;
-    background: var(--bg-panel);
-    border: 1px solid var(--line);
-    border-radius: 6px;
-    padding: 24px;
-  }
-  label {
-    display: block;
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.6px;
-    color: var(--paper-dim);
-    margin-bottom: 6px;
-    margin-top: 18px;
-  }
-  label:first-of-type { margin-top: 0; }
-  input[type=text], textarea, select {
-    width: 100%;
-    background: var(--bg-raised);
-    border: 1px solid var(--line);
-    border-radius: 4px;
-    color: var(--paper);
-    font-family: 'IBM Plex Sans', sans-serif;
-    font-size: 13.5px;
-    padding: 9px 10px;
-  }
-  textarea { resize: vertical; min-height: 70px; }
-  input:focus, textarea:focus, select:focus { outline: 1px solid var(--moss); }
-
-  .road-status-options { display: flex; gap: 8px; }
-  .road-status-options label.pill {
-    flex: 1;
-    text-align: center;
-    text-transform: none;
-    letter-spacing: 0;
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 12px;
-    border: 1px solid var(--line);
-    border-radius: 4px;
-    padding: 8px 4px;
-    cursor: pointer;
-    color: var(--paper-dim);
-    margin: 0;
-  }
-  .road-status-options input[type=radio] { display: none; }
-  .road-status-options input[type=radio]:checked + span { font-weight: 600; }
-  .road-status-options label.pill:has(input:checked)[data-status="OPEN"]    { border-color: var(--moss); color: var(--moss); }
-  .road-status-options label.pill:has(input:checked)[data-status="CAUTION"] { border-color: var(--ochre); color: var(--ochre); }
-  .road-status-options label.pill:has(input:checked)[data-status="BLOCKED"]{ border-color: var(--clay); color: var(--clay); }
-
-  .file-row {
-    border: 1px dashed var(--line);
-    border-radius: 4px;
-    padding: 12px;
-    text-align: center;
-    font-size: 12px;
-    color: var(--paper-dim);
-  }
-  #photoPreview { max-width: 100%; margin-top: 10px; border-radius: 4px; display: none; }
-
-  button {
-    width: 100%;
-    margin-top: 22px;
-    background: var(--moss);
-    color: #12140f;
-    border: none;
-    border-radius: 4px;
-    font-family: 'Space Grotesk', sans-serif;
-    font-weight: 700;
-    font-size: 14px;
-    padding: 12px;
-    cursor: pointer;
-  }
-  button:disabled { opacity: 0.5; cursor: not-allowed; }
-  button:hover:not(:disabled) { filter: brightness(1.08); }
-
-  #statusMsg {
-    max-width: 440px;
-    width: 100%;
-    margin-top: 16px;
-    padding: 12px 14px;
-    border-radius: 4px;
-    font-size: 13px;
-    display: none;
-  }
-  #statusMsg.success { display: block; background: rgba(122,155,110,0.12); border: 1px solid var(--moss); color: var(--moss); }
-  #statusMsg.error   { display: block; background: rgba(179,72,58,0.12); border: 1px solid var(--clay); color: var(--clay); }
-
-  .hint { font-size: 11px; color: var(--paper-dim); margin-top: 6px; }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LandSense ML - Field Report</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <meta name="theme-color" content="#181b14">
+  <style>
+    :root {
+      --bg-map:       #12140f;
+      --bg-panel:     #181b14;
+      --bg-raised:    #1f2318;
+      --line:         #333829;
+      --paper:        #ece7d8;
+      --paper-dim:    #8d8f79;
+      --moss:         #7a9b6e;
+      --ochre:        #c98a3b;
+      --clay:         #b3483a;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { 
+      background: var(--bg-map); 
+      color: var(--paper); 
+      font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      padding: 30px 16px 60px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+    header { text-align: center; margin-bottom: 24px; }
+    .logo { font-size: 22px; font-weight: 700; }
+    .logo span { color: var(--moss); }
+    .subtitle { font-size: 12px; color: var(--paper-dim); margin-top: 4px; }
+    
+    form { 
+      width: 100%; 
+      max-width: 440px;
+      background: var(--bg-panel); 
+      border: 1px solid var(--line); 
+      border-radius: 6px; 
+      padding: 24px;
+    }
+    label { 
+      display: block; 
+      margin-top: 18px; 
+      font-size: 11px; 
+      text-transform: uppercase;
+      color: var(--paper-dim); 
+      font-weight: 600;
+    }
+    label:first-of-type { margin-top: 0; }
+    input[type=text], textarea, select { 
+      width: 100%; 
+      padding: 9px 10px; 
+      margin-top: 6px;
+      background: var(--bg-raised); 
+      color: var(--paper); 
+      border: 1px solid var(--line); 
+      border-radius: 4px; 
+      font-family: inherit;
+      font-size: 13.5px;
+    }
+    textarea { resize: vertical; min-height: 70px; }
+    input:focus, textarea:focus, select:focus { outline: 1px solid var(--moss); }
+    
+    /* Road status pills */
+    .road-status-options { 
+      display: flex; 
+      gap: 8px; 
+      margin-top: 8px;
+    }
+    .road-status-options label { 
+      flex: 1;
+      margin: 0;
+      text-transform: none;
+      font-size: 12px;
+      padding: 8px 4px;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      text-align: center;
+      cursor: pointer;
+      color: var(--paper-dim);
+    }
+    .road-status-options input { display: none; }
+    .road-status-options input:checked + span { font-weight: 600; }
+    .road-status-options input[value="OPEN"]:checked + span { color: var(--moss); }
+    .road-status-options input[value="CAUTION"]:checked + span { color: var(--ochre); }
+    .road-status-options input[value="BLOCKED"]:checked + span { color: var(--clay); }
+    .road-status-options label:has(input[value="OPEN"]:checked) { border-color: var(--moss); }
+    .road-status-options label:has(input[value="CAUTION"]:checked) { border-color: var(--ochre); }
+    .road-status-options label:has(input[value="BLOCKED"]:checked) { border-color: var(--clay); }
+    
+    button { 
+      width: 100%; 
+      padding: 12px; 
+      margin-top: 22px; 
+      background: var(--moss); 
+      color: #12140f; 
+      border: none; 
+      border-radius: 4px; 
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    button:hover:not(:disabled) { filter: brightness(1.08); }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+    
+    .status { 
+      max-width: 440px;
+      width: 100%;
+      margin-top: 16px; 
+      padding: 12px 14px; 
+      border-radius: 4px; 
+      font-size: 13px;
+      display: none;
+    }
+    .status.success { 
+      background: rgba(122,155,110,0.12); 
+      color: var(--moss); 
+      border: 1px solid var(--moss);
+    }
+    .status.error { 
+      background: rgba(179,72,58,0.12); 
+      color: var(--clay); 
+      border: 1px solid var(--clay);
+    }
+    .hint { font-size: 11px; color: var(--paper-dim); margin-top: 4px; }
+  </style>
 </head>
 <body>
-
-<header>
-  <div class="logo">LandSense<span>ML</span></div>
-  <div class="subtitle">Field / Citizen Hazard Report</div>
-</header>
-
-<form id="reportForm">
-  <label for="location_name">Location</label>
-  <input type="text" id="location_name" placeholder="e.g. NH-40 near Shillong, 2km past the market" required>
-  <div class="hint" id="geoHint">Trying to attach your GPS location…</div>
-
-  <label for="issue_type">Issue type</label>
-  <select id="issue_type" required>
-    <option value="" disabled selected>Select an issue</option>
-    <option value="landslide">Landslide</option>
-    <option value="blocked_road">Blocked road</option>
-    <option value="crack_slope_movement">Crack / slope movement</option>
-    <option value="flooding">Flooding</option>
-    <option value="other">Other</option>
-  </select>
-
-  <label>Road status (optional)</label>
-  <div class="road-status-options">
-    <label class="pill" data-status="OPEN"><input type="radio" name="road_status" value="OPEN"><span>OPEN</span></label>
-    <label class="pill" data-status="CAUTION"><input type="radio" name="road_status" value="CAUTION"><span>CAUTION</span></label>
-    <label class="pill" data-status="BLOCKED"><input type="radio" name="road_status" value="BLOCKED"><span>BLOCKED</span></label>
-  </div>
-
-  <label for="description">Description</label>
-  <textarea id="description" placeholder="What did you see? Include anything that helps responders."></textarea>
-
-  <label for="photo">Photo (optional)</label>
-  <div class="file-row">
+  <header>
+    <div class="logo">LandSense<span>ML</span></div>
+    <div class="subtitle">Field / Citizen Hazard Report</div>
+  </header>
+  
+  <form id="reportForm">
+    <label for="location">Location</label>
+    <input type="text" id="location" placeholder="e.g., NH-40 near Shillong, 2km past the market" required>
+    <div class="hint" id="geoStatus">Detecting GPS location…</div>
+    
+    <label for="issueType">Issue Type</label>
+    <select id="issueType" required>
+      <option value="">Select an issue</option>
+      <option value="landslide">Landslide</option>
+      <option value="blocked_road">Blocked Road</option>
+      <option value="crack_slope_movement">Crack / Slope Movement</option>
+      <option value="flooding">Flooding</option>
+      <option value="other">Other</option>
+    </select>
+    
+    <label>Road Status (optional)</label>
+    <div class="road-status-options">
+      <label><input type="radio" name="roadStatus" value="OPEN"><span>OPEN</span></label>
+      <label><input type="radio" name="roadStatus" value="CAUTION"><span>CAUTION</span></label>
+      <label><input type="radio" name="roadStatus" value="BLOCKED"><span>BLOCKED</span></label>
+    </div>
+    
+    <label for="description">Description</label>
+    <textarea id="description" placeholder="What did you see? Include anything that helps responders." required></textarea>
+    
+    <label for="photo">Photo (optional)</label>
     <input type="file" id="photo" accept="image/*" capture="environment">
-    <img id="photoPreview" alt="Preview">
-  </div>
+    
+    <label for="name">Your Name (optional)</label>
+    <input type="text" id="name" placeholder="Anonymous">
+    
+    <button type="submit" id="submitBtn">Submit report</button>
+  </form>
+  
+  <div id="statusMsg" class="status"></div>
 
-  <label for="reporter_name">Your name (optional)</label>
-  <input type="text" id="reporter_name" placeholder="Anonymous">
-
-  <button type="submit" id="submitBtn">Submit report</button>
-</form>
-
-<div id="statusMsg"></div>
-
-<script>
-// Empty string = same-origin relative paths (see map.html for why)
-const API_BASE = '';
-
-let userLat = null, userLng = null;
-if (navigator.geolocation) {
-  navigator.geolocation.getCurrentPosition(
-    pos => {
-      userLat = pos.coords.latitude;
-      userLng = pos.coords.longitude;
-      document.getElementById('geoHint').textContent =
-        `GPS attached (${userLat.toFixed(4)}, ${userLng.toFixed(4)})`;
-    },
-    () => { document.getElementById('geoHint').textContent = 'GPS unavailable — location name only.'; }
-  );
-} else {
-  document.getElementById('geoHint').textContent = '';
-}
-
-let photoBase64 = null;
-document.getElementById('photo').addEventListener('change', (e) => {
-  const file = e.target.files[0];
-  if (!file) { photoBase64 = null; return; }
-  const reader = new FileReader();
-  reader.onload = () => {
-    photoBase64 = reader.result;
-    const img = document.getElementById('photoPreview');
-    img.src = photoBase64;
-    img.style.display = 'block';
-  };
-  reader.readAsDataURL(file);
-});
-
-document.getElementById('reportForm').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const btn = document.getElementById('submitBtn');
-  const statusMsg = document.getElementById('statusMsg');
-  btn.disabled = true;
-  btn.textContent = 'Submitting…';
-  statusMsg.className = '';
-
-  const roadStatusEl = document.querySelector('input[name="road_status"]:checked');
-
-  const payload = {
-    location_name: document.getElementById('location_name').value.trim(),
-    lat: userLat,
-    lng: userLng,
-    issue_type: document.getElementById('issue_type').value,
-    road_status: roadStatusEl ? roadStatusEl.value : null,
-    description: document.getElementById('description').value.trim(),
-    photo_base64: photoBase64,
-    reporter_name: document.getElementById('reporter_name').value.trim() || 'Anonymous'
-  };
-
-  try {
-    const resp = await fetch(`${API_BASE}/api/reports`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
+  <script>
+    const API_BASE = window.location.hostname === 'localhost' 
+      ? 'http://127.0.0.1:5000'
+      : `${window.location.protocol}//${window.location.host}`;
+    
+    let userLat = null, userLng = null;
+    
+    // Get GPS location
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          userLat = pos.coords.latitude;
+          userLng = pos.coords.longitude;
+          document.getElementById('geoStatus').textContent = `GPS attached (${userLat.toFixed(4)}, ${userLng.toFixed(4)})`;
+        },
+        () => {
+          document.getElementById('geoStatus').textContent = 'GPS unavailable — enter location name manually.';
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+      );
+    }
+    
+    // Photo upload
+    let photoBase64 = null;
+    document.getElementById('photo').addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) { photoBase64 = null; return; }
+      const reader = new FileReader();
+      reader.onload = () => { photoBase64 = reader.result; };
+      reader.readAsDataURL(file);
     });
-    const data = await resp.json();
-    if (data.success) {
-      statusMsg.textContent = 'Report submitted — thank you. Responders can see this on the dashboard.';
-      statusMsg.className = 'success';
-      document.getElementById('reportForm').reset();
-      document.getElementById('photoPreview').style.display = 'none';
-      photoBase64 = null;
-    } else {
-      statusMsg.textContent = `Could not submit: ${data.error || 'unknown error'}`;
-      statusMsg.className = 'error';
-    }
-  } catch (err) {
-    // WHY: PS 26001 asks for low-network/offline support for
-    // remote NER villages. Real offline-first would need a
-    // service worker + background sync — out of scope for the
-    // remaining time. This is the honest middle ground: if the
-    // network fails right now, the report is saved locally
-    // (not lost) and auto-retried the next time this page is
-    // opened with a connection, or the moment the browser
-    // detects it's back online.
-    queueReportOffline(payload);
-    statusMsg.textContent = 'No connection — report saved on this device and will auto-submit once you\'re back online.';
-    statusMsg.className = 'success';
-    document.getElementById('reportForm').reset();
-    document.getElementById('photoPreview').style.display = 'none';
-    photoBase64 = null;
-  } finally {
-    btn.disabled = false;
-    btn.textContent = 'Submit report';
-  }
-});
-
-// ─── Offline queue ────────────────────────────
-const OFFLINE_QUEUE_KEY = 'landsense_offline_reports';
-
-function queueReportOffline(payload) {
-  const queue = JSON.parse(localStorage.getItem(OFFLINE_QUEUE_KEY) || '[]');
-  queue.push(payload);
-  localStorage.setItem(OFFLINE_QUEUE_KEY, JSON.stringify(queue));
-  updateOfflineQueueBanner();
-}
-
-async function trySyncOfflineQueue() {
-  const queue = JSON.parse(localStorage.getItem(OFFLINE_QUEUE_KEY) || '[]');
-  if (!queue.length) return;
-
-  const stillFailed = [];
-  for (const payload of queue) {
-    try {
-      const resp = await fetch(`${API_BASE}/api/reports`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      const data = await resp.json();
-      if (!data.success) stillFailed.push(payload); // server rejected it (e.g. bad data) — don't silently drop
-    } catch (e) {
-      stillFailed.push(payload); // still offline, keep it queued
-    }
-  }
-  localStorage.setItem(OFFLINE_QUEUE_KEY, JSON.stringify(stillFailed));
-  updateOfflineQueueBanner();
-}
-
-function updateOfflineQueueBanner() {
-  const queue = JSON.parse(localStorage.getItem(OFFLINE_QUEUE_KEY) || '[]');
-  let banner = document.getElementById('offlineQueueBanner');
-  if (!queue.length) {
-    if (banner) banner.remove();
-    return;
-  }
-  if (!banner) {
-    banner = document.createElement('div');
-    banner.id = 'offlineQueueBanner';
-    banner.style.cssText = 'max-width:440px;width:100%;margin-top:12px;padding:10px 14px;border-radius:4px;font-size:12px;background:rgba(201,138,59,0.12);border:1px solid var(--ochre);color:var(--ochre);';
-    document.body.insertBefore(banner, document.getElementById('statusMsg').nextSibling);
-  }
-  banner.textContent = `${queue.length} report(s) waiting to sync — will retry automatically when back online.`;
-}
-
-// Retry on page load (in case connection is back) and the
-// instant the browser fires its 'online' event.
-trySyncOfflineQueue();
-window.addEventListener('online', trySyncOfflineQueue);
-
-// ─── PWA: register service worker ────────────
-// Makes this page installable (Android "Add to Home
-// Screen" / iOS Safari "Add to Home Screen") and lets it
-// load with no network at all, not just queue submissions.
-// Fails silently and harmlessly if the browser doesn't
-// support service workers — nothing else on the page
-// depends on this succeeding.
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('service-worker.js')
-      .catch((err) => console.log('Service worker registration failed:', err));
-  });
-}
-</script>
-
-</body>
-</html><!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>LandSense ML — Field Report</title>
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#181b14">
-<link rel="apple-touch-icon" href="icon-192.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --bg-map:       #12140f;
-    --bg-panel:     #181b14;
-    --bg-raised:    #1f2318;
-    --line:         #333829;
-    --line-soft:    #262a1d;
-    --paper:        #ece7d8;
-    --paper-dim:    #8d8f79;
-    --moss:         #7a9b6e;
-    --ochre:        #c98a3b;
-    --clay:         #b3483a;
-  }
-  * { margin:0; padding:0; box-sizing:border-box; }
-  body {
-    background: var(--bg-map);
-    color: var(--paper);
-    font-family: 'IBM Plex Sans', sans-serif;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 32px 16px 60px;
-  }
-  header { text-align: center; margin-bottom: 24px; }
-  .logo { font-family: 'Space Grotesk', sans-serif; font-size: 22px; font-weight: 700; }
-  .logo span { color: var(--moss); }
-  .subtitle { font-size: 12px; color: var(--paper-dim); margin-top: 4px; }
-
-  form {
-    width: 100%;
-    max-width: 440px;
-    background: var(--bg-panel);
-    border: 1px solid var(--line);
-    border-radius: 6px;
-    padding: 24px;
-  }
-  label {
-    display: block;
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.6px;
-    color: var(--paper-dim);
-    margin-bottom: 6px;
-    margin-top: 18px;
-  }
-  label:first-of-type { margin-top: 0; }
-  input[type=text], textarea, select {
-    width: 100%;
-    background: var(--bg-raised);
-    border: 1px solid var(--line);
-    border-radius: 4px;
-    color: var(--paper);
-    font-family: 'IBM Plex Sans', sans-serif;
-    font-size: 13.5px;
-    padding: 9px 10px;
-  }
-  textarea { resize: vertical; min-height: 70px; }
-  input:focus, textarea:focus, select:focus { outline: 1px solid var(--moss); }
-
-  .road-status-options { display: flex; gap: 8px; }
-  .road-status-options label.pill {
-    flex: 1;
-    text-align: center;
-    text-transform: none;
-    letter-spacing: 0;
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 12px;
-    border: 1px solid var(--line);
-    border-radius: 4px;
-    padding: 8px 4px;
-    cursor: pointer;
-    color: var(--paper-dim);
-    margin: 0;
-  }
-  .road-status-options input[type=radio] { display: none; }
-  .road-status-options input[type=radio]:checked + span { font-weight: 600; }
-  .road-status-options label.pill:has(input:checked)[data-status="OPEN"]    { border-color: var(--moss); color: var(--moss); }
-  .road-status-options label.pill:has(input:checked)[data-status="CAUTION"] { border-color: var(--ochre); color: var(--ochre); }
-  .road-status-options label.pill:has(input:checked)[data-status="BLOCKED"]{ border-color: var(--clay); color: var(--clay); }
-
-  .file-row {
-    border: 1px dashed var(--line);
-    border-radius: 4px;
-    padding: 12px;
-    text-align: center;
-    font-size: 12px;
-    color: var(--paper-dim);
-  }
-  #photoPreview { max-width: 100%; margin-top: 10px; border-radius: 4px; display: none; }
-
-  button {
-    width: 100%;
-    margin-top: 22px;
-    background: var(--moss);
-    color: #12140f;
-    border: none;
-    border-radius: 4px;
-    font-family: 'Space Grotesk', sans-serif;
-    font-weight: 700;
-    font-size: 14px;
-    padding: 12px;
-    cursor: pointer;
-  }
-  button:disabled { opacity: 0.5; cursor: not-allowed; }
-  button:hover:not(:disabled) { filter: brightness(1.08); }
-
-  #statusMsg {
-    max-width: 440px;
-    width: 100%;
-    margin-top: 16px;
-    padding: 12px 14px;
-    border-radius: 4px;
-    font-size: 13px;
-    display: none;
-  }
-  #statusMsg.success { display: block; background: rgba(122,155,110,0.12); border: 1px solid var(--moss); color: var(--moss); }
-  #statusMsg.error   { display: block; background: rgba(179,72,58,0.12); border: 1px solid var(--clay); color: var(--clay); }
-
-  .hint { font-size: 11px; color: var(--paper-dim); margin-top: 6px; }
-</style>
-</head>
-<body>
-
-<header>
-  <div class="logo">LandSense<span>ML</span></div>
-  <div class="subtitle">Field / Citizen Hazard Report</div>
-</header>
-
-<form id="reportForm">
-  <label for="location_name">Location</label>
-  <input type="text" id="location_name" placeholder="e.g. NH-40 near Shillong, 2km past the market" required>
-  <div class="hint" id="geoHint">Trying to attach your GPS location…</div>
-
-  <label for="issue_type">Issue type</label>
-  <select id="issue_type" required>
-    <option value="" disabled selected>Select an issue</option>
-    <option value="landslide">Landslide</option>
-    <option value="blocked_road">Blocked road</option>
-    <option value="crack_slope_movement">Crack / slope movement</option>
-    <option value="flooding">Flooding</option>
-    <option value="other">Other</option>
-  </select>
-
-  <label>Road status (optional)</label>
-  <div class="road-status-options">
-    <label class="pill" data-status="OPEN"><input type="radio" name="road_status" value="OPEN"><span>OPEN</span></label>
-    <label class="pill" data-status="CAUTION"><input type="radio" name="road_status" value="CAUTION"><span>CAUTION</span></label>
-    <label class="pill" data-status="BLOCKED"><input type="radio" name="road_status" value="BLOCKED"><span>BLOCKED</span></label>
-  </div>
-
-  <label for="description">Description</label>
-  <textarea id="description" placeholder="What did you see? Include anything that helps responders."></textarea>
-
-  <label for="photo">Photo (optional)</label>
-  <div class="file-row">
-    <input type="file" id="photo" accept="image/*" capture="environment">
-    <img id="photoPreview" alt="Preview">
-  </div>
-
-  <label for="reporter_name">Your name (optional)</label>
-  <input type="text" id="reporter_name" placeholder="Anonymous">
-
-  <button type="submit" id="submitBtn">Submit report</button>
-</form>
-
-<div id="statusMsg"></div>
-
-<script>
-// Empty string = same-origin relative paths (see map.html for why)
-const API_BASE = '';
-
-let userLat = null, userLng = null;
-if (navigator.geolocation) {
-  navigator.geolocation.getCurrentPosition(
-    pos => {
-      userLat = pos.coords.latitude;
-      userLng = pos.coords.longitude;
-      document.getElementById('geoHint').textContent =
-        `GPS attached (${userLat.toFixed(4)}, ${userLng.toFixed(4)})`;
-    },
-    () => { document.getElementById('geoHint').textContent = 'GPS unavailable — location name only.'; }
-  );
-} else {
-  document.getElementById('geoHint').textContent = '';
-}
-
-let photoBase64 = null;
-document.getElementById('photo').addEventListener('change', (e) => {
-  const file = e.target.files[0];
-  if (!file) { photoBase64 = null; return; }
-  const reader = new FileReader();
-  reader.onload = () => {
-    photoBase64 = reader.result;
-    const img = document.getElementById('photoPreview');
-    img.src = photoBase64;
-    img.style.display = 'block';
-  };
-  reader.readAsDataURL(file);
-});
-
-document.getElementById('reportForm').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const btn = document.getElementById('submitBtn');
-  const statusMsg = document.getElementById('statusMsg');
-  btn.disabled = true;
-  btn.textContent = 'Submitting…';
-  statusMsg.className = '';
-
-  const roadStatusEl = document.querySelector('input[name="road_status"]:checked');
-
-  const payload = {
-    location_name: document.getElementById('location_name').value.trim(),
-    lat: userLat,
-    lng: userLng,
-    issue_type: document.getElementById('issue_type').value,
-    road_status: roadStatusEl ? roadStatusEl.value : null,
-    description: document.getElementById('description').value.trim(),
-    photo_base64: photoBase64,
-    reporter_name: document.getElementById('reporter_name').value.trim() || 'Anonymous'
-  };
-
-  try {
-    const resp = await fetch(`${API_BASE}/api/reports`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
+    
+    // Form submission
+    document.getElementById('reportForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('submitBtn');
+      const status = document.getElementById('statusMsg');
+      
+      btn.disabled = true;
+      btn.textContent = 'Submitting…';
+      status.className = '';
+      
+      const roadStatusEl = document.querySelector('input[name="roadStatus"]:checked');
+      
+      const payload = {
+        location_name: document.getElementById('location').value.trim(),
+        lat: userLat,
+        lng: userLng,
+        issue_type: document.getElementById('issueType').value,
+        road_status: roadStatusEl ? roadStatusEl.value : null,
+        description: document.getElementById('description').value.trim(),
+        photo_base64: photoBase64,
+        reporter_name: document.getElementById('name').value.trim() || 'Anonymous'
+      };
+      
+      try {
+        const resp = await fetch(`${API_BASE}/api/reports`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await resp.json();
+        if (data.success) {
+          status.textContent = 'Report submitted — thank you. Responders can see this on the dashboard.';
+          status.className = 'status success';
+          document.getElementById('reportForm').reset();
+          photoBase64 = null;
+        } else {
+          throw new Error(data.error || 'unknown error');
+        }
+      } catch (err) {
+        status.textContent = `Could not submit: ${err.message}`;
+        status.className = 'status error';
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Submit report';
+        status.style.display = 'block';
+      }
     });
-    const data = await resp.json();
-    if (data.success) {
-      statusMsg.textContent = 'Report submitted — thank you. Responders can see this on the dashboard.';
-      statusMsg.className = 'success';
-      document.getElementById('reportForm').reset();
-      document.getElementById('photoPreview').style.display = 'none';
-      photoBase64 = null;
-    } else {
-      statusMsg.textContent = `Could not submit: ${data.error || 'unknown error'}`;
-      statusMsg.className = 'error';
-    }
-  } catch (err) {
-    // WHY: PS 26001 asks for low-network/offline support for
-    // remote NER villages. Real offline-first would need a
-    // service worker + background sync — out of scope for the
-    // remaining time. This is the honest middle ground: if the
-    // network fails right now, the report is saved locally
-    // (not lost) and auto-retried the next time this page is
-    // opened with a connection, or the moment the browser
-    // detects it's back online.
-    queueReportOffline(payload);
-    statusMsg.textContent = 'No connection — report saved on this device and will auto-submit once you\'re back online.';
-    statusMsg.className = 'success';
-    document.getElementById('reportForm').reset();
-    document.getElementById('photoPreview').style.display = 'none';
-    photoBase64 = null;
-  } finally {
-    btn.disabled = false;
-    btn.textContent = 'Submit report';
-  }
-});
-
-// ─── Offline queue ────────────────────────────
-const OFFLINE_QUEUE_KEY = 'landsense_offline_reports';
-
-function queueReportOffline(payload) {
-  const queue = JSON.parse(localStorage.getItem(OFFLINE_QUEUE_KEY) || '[]');
-  queue.push(payload);
-  localStorage.setItem(OFFLINE_QUEUE_KEY, JSON.stringify(queue));
-  updateOfflineQueueBanner();
-}
-
-async function trySyncOfflineQueue() {
-  const queue = JSON.parse(localStorage.getItem(OFFLINE_QUEUE_KEY) || '[]');
-  if (!queue.length) return;
-
-  const stillFailed = [];
-  for (const payload of queue) {
-    try {
-      const resp = await fetch(`${API_BASE}/api/reports`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+    
+    // PWA: register service worker
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('service-worker.js')
+          .catch((err) => console.log('Service worker registration failed:', err));
       });
-      const data = await resp.json();
-      if (!data.success) stillFailed.push(payload); // server rejected it (e.g. bad data) — don't silently drop
-    } catch (e) {
-      stillFailed.push(payload); // still offline, keep it queued
     }
-  }
-  localStorage.setItem(OFFLINE_QUEUE_KEY, JSON.stringify(stillFailed));
-  updateOfflineQueueBanner();
-}
-
-function updateOfflineQueueBanner() {
-  const queue = JSON.parse(localStorage.getItem(OFFLINE_QUEUE_KEY) || '[]');
-  let banner = document.getElementById('offlineQueueBanner');
-  if (!queue.length) {
-    if (banner) banner.remove();
-    return;
-  }
-  if (!banner) {
-    banner = document.createElement('div');
-    banner.id = 'offlineQueueBanner';
-    banner.style.cssText = 'max-width:440px;width:100%;margin-top:12px;padding:10px 14px;border-radius:4px;font-size:12px;background:rgba(201,138,59,0.12);border:1px solid var(--ochre);color:var(--ochre);';
-    document.body.insertBefore(banner, document.getElementById('statusMsg').nextSibling);
-  }
-  banner.textContent = `${queue.length} report(s) waiting to sync — will retry automatically when back online.`;
-}
-
-// Retry on page load (in case connection is back) and the
-// instant the browser fires its 'online' event.
-trySyncOfflineQueue();
-window.addEventListener('online', trySyncOfflineQueue);
-
-// ─── PWA: register service worker ────────────
-// Makes this page installable (Android "Add to Home
-// Screen" / iOS Safari "Add to Home Screen") and lets it
-// load with no network at all, not just queue submissions.
-// Fails silently and harmlessly if the browser doesn't
-// support service workers — nothing else on the page
-// depends on this succeeding.
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('service-worker.js')
-      .catch((err) => console.log('Service worker registration failed:', err));
-  });
-}
-</script>
-
+  </script>
 </body>
 </html>
