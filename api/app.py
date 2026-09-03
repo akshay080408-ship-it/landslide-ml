@@ -99,13 +99,19 @@ def serve_icon(size):
 
 @app.route('/<path:filename>')
 def serve_static(filename):
-    """Catch-all for static assets (skip /api/* and /report routes)"""
-    # Don't serve files for /api/* routes or /report (has its own route)
-    if filename.startswith('api/') or filename == 'report' or filename == 'report.html':
+    """Catch-all for static assets (skip /api/* routes)"""
+    # Don't serve files for /api/* routes — let them go to the API endpoints
+    if filename.startswith('api/'):
         return {'error': 'File not found'}, 404
     
     try:
-        return send_from_directory(...)
+        return send_from_directory(
+            os.path.join(os.path.dirname(__file__), '..', 'dashboard'),
+            filename
+        )
+    except:
+        return {'error': 'File not found'}, 404
+
 # ════════════════════════════════════════════
 # PERSISTENCE (SQLite)
 # WHY: alert_history and field_reports previously
