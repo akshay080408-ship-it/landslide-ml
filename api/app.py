@@ -99,7 +99,11 @@ def serve_icon(size):
 
 @app.route('/<path:filename>')
 def serve_static(filename):
-    """Catch-all for any other static assets"""
+    """Catch-all for static assets (skip /api/* routes)"""
+    # Don't serve files for /api/* routes — let them go to the API endpoints
+    if filename.startswith('api/'):
+        return {'error': 'File not found'}, 404
+    
     try:
         return send_from_directory(
             os.path.join(os.path.dirname(__file__), '..', 'dashboard'),
@@ -890,85 +894,6 @@ SMS_CONFIG = {
     ]
 }
 
-class SmsAlertManager:
-    """
-    Mirrors EmailAlertManager's per-node cooldown so a
-    DANGER alert from one node doesn't block SMS to
-    another. Cooldown is tracked SEPARATELY from email's
-    (its own dict) — the two channels don't share state,
-    so if you ever silence one channel it doesn't
-    accidentally silence the other.
-    """
-    def __init__(self, cooldown_minutes=10, test_mode=True):
-        self.cooldown_seconds = cooldown_minutes * 60
-        self.last_sms_time = {}  # node_id -> timestamp
-        self.test_mode = test_mode
-        self.sms_sent_count = 0
-        self.sms_blocked_count = 0
-        self._client = None
-
-    def should_send_sms(self, node_id, risk_code):
-        if risk_code < 2:  # Only DANGER triggers SMS
-            return False
-
-        now = time.time()
-        last = self.last_sms_time.get(node_id)
-        if last is None or (now - last) > self.cooldown_seconds:
-            self.last_sms_time[node_id] = now
-            return True
-
-        self.sms_blocked_count += 1
-        return False
-
-    def send_alert(self, prediction_data):
-        message = self._build_message(prediction_data)
-
-        if self.test_mode:
-            logger.info(f"[TEST MODE] Would SMS: {message}")
-            self.sms_sent_count += 1
-            return True
-        return self._actually_send_sms(message)
-
-    def _build_message(self, data):
-        # Real SMS is billed/limited per ~160 chars — adding
-        # Hindi + Assamese means this spans more segments,
-        # an acceptable tradeoff for reaching more people.
-        # Same confidence caveat as the email version: Hindi
-        # is high-confidence, Assamese is good-faith but
-        # recommend native-speaker review before real use.
-        return (
-            f"LandSense ALERT: DANGER at {data['node_id']} "
-            f"({data['confidence']}% confidence). "
-            f"Immediate field verification advised. "
-            f"Time: {data['timestamp']}\n"
-            f"चेतावनी: {data['node_id']} में खतरा ({data['confidence']}% विश्वास)। "
-            f"कृपया तुरंत जांच करें।\n"
-            f"সতৰ্কবাণী: {data['node_id']}ত বিপদ ({data['confidence']}% বিশ্বাস)। "
-            f"অনুগ্ৰহ কৰি তৎক্ষণাৎ পৰীক্ষা কৰক।"
-        )
-
-    def _actually_send_sms(self, message):
-        try:
-            # Imported here, not at the top of the file, so the
-            # whole API doesn't fail to start if the `twilio`
-            # package isn't installed and you're still in TEST_MODE.
-            from twilio.rest import Client
-            if self._client is None:
-                self._client = Client(SMS_CONFIG['account_sid'], SMS_CONFIG['auth_token'])
-
-            for number in SMS_CONFIG['recipient_numbers']:
-                self._client.messages.create(
-                    body=message, from_=SMS_CONFIG['from_number'], to=number
-                )
-            self.sms_sent_count += 1
-            logger.info("SMS sent successfully")
-            return True
-        except Exception as e:
-            logger.error(f"SMS failed: {e}")
-            return False
-
-sms_manager = SmsAlertManager(cooldown_minutes=10, test_mode=SMS_TEST_MODE)
-
 # Alert history — GET /api/alerts reads this. Now
 # backed by SQLite (see PERSISTENCE section above) so
 # a server restart doesn't lose the alert log.
@@ -1054,11 +979,8 @@ def validate_input(data):
 # ROUTES
 # ════════════════════════════════════════════
 
-@app.route('/api')
+@app.route('/')
 def home():
-    # WAS also registered at '/' — but '/' is already claimed by
-    # serve_dashboard() above (which wins silently, making this
-    # dead code). Moved to /api so both are actually reachable.
     return jsonify({
         'project': 'LandSense ML API (Hardened v2)',
         'status': 'running',
